@@ -1,0 +1,31 @@
+<div class="flex flex-col h-screen">
+  <!-- Navbar -->
+  <app-navbar
+    [user]="currentUser()"
+    (toggleSidebar)="toggleSidebar()"
+    (logout)="onLogout()"
+  ></app-navbar>
+
+  <!-- Main body -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    @if (showSidebar()) {
+      <app-sidebar
+        [open]="sidebarOpen()"
+        [userRole]="currentUser()?.role"
+        (toggleMobile)="toggleSidebar()"
+      ></app-sidebar>
+    }
+
+    <!-- Main content -->
+    <main
+      class="flex-1 overflow-y-auto px-6 pb-6 pt-20 sm:pt-24 transition-all duration-300"
+      [ngClass]="{
+        'sm:ml-64': showSidebar() && sidebarOpen(),  
+        'sm:ml-0': !showSidebar() || !sidebarOpen()
+      }"
+    >
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

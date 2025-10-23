@@ -1,0 +1,49 @@
+<header class="fixed top-0 left-0 right-0 bg-secondary-dark z-20" role="banner">
+  <div class="px-6 py-3 flex items-center justify-between">
+    <!-- Left section: menu button + logo -->
+    <div class="flex items-center gap-3">
+      <button class="text-text-light sm:hidden" (click)="onToggleSidebar()" aria-label="Open menu">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <h1 class="text-text-light text-2xl font-bold">
+        Rent<span class="text-primary-accent">Mate</span>
+      </h1>
+    </div>
+
+    <!-- Center section (desktop links) -->
+    <div class="hidden sm:flex items-center gap-6">
+      <a class="text-text-light text-sm font-medium hover:text-primary-accent transition-colors" routerLink="/browse">Browse Rentals</a>
+      <a class="text-text-light text-sm font-medium hover:text-primary-accent transition-colors" routerLink="/about">About Us</a>
+      <a class="text-text-light text-sm font-medium hover:text-primary-accent transition-colors" routerLink="/contact">Contact</a>
+    </div>
+
+    <!-- Right section (user controls) -->
+    <div class="flex items-center gap-2">
+      @if (user()) {
+        <div class="user-menu relative" [class.open]="dropdownOpen()">
+          <button class="flex items-center gap-2 px-3 py-2 text-text-light hover:bg-primary-dark rounded-md" (click)="onToggleDropdown()">
+            <span class="w-8 h-8 bg-primary-accent text-primary-dark rounded-full flex items-center justify-center text-sm font-semibold">
+              {{ user()?.username ? user.name.charAt(0).toUpperCase() : 'U' }}
+            </span>
+            <span class="hidden sm:block">{{ user()?.username || 'User' }}</span>
+          </button>
+
+          <div class="absolute right-0 mt-2 w-48 bg-secondary-dark rounded-md shadow-lg border border-gray-700" *ngIf="dropdownOpen()" role="menu">
+            <a routerLink="/profile" class="block px-4 py-2 text-text-light hover:bg-primary-dark rounded-md" (click)="onToggleDropdown()">My Profile</a>
+            <button class="block w-full text-left px-4 py-2 text-text-light hover:bg-primary-dark rounded-md" (click)="showLogoutModal.set(true)">Logout</button>
+          </div>
+
+          @if (showLogoutModal()) {
+            <app-logout-confirm-modal
+              (confirm)="onLogout()"
+              (cancel)="showLogoutModal.set(false)"
+            />
+          }
+        </div>
+      } @else {
+        <button class="px-4 py-2 bg-secondary-accent text-primary-dark rounded-md text-sm font-semibold hover:bg-yellow-400 transition-colors" routerLink="/login">Login</button>
+        <button class="px-4 py-2 bg-primary-accent text-primary-dark rounded-md text-sm font-semibold hover:bg-yellow-500 transition-colors" routerLink="/register">Register</button>
+      }
+    </div>
+  </div>
+</header>
