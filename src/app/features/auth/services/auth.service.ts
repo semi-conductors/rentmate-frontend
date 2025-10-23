@@ -3,8 +3,9 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, of, switchMap, tap } from 'rxjs';
 import { User } from '../models/user';
-import { AuthResponse } from '../models/authResponse';
-import { RegisterRequest } from '../models/registerRequest';
+import { AuthResponse } from '../models/auth.response';
+import { RegisterRequest } from '../models/register.request';
+import { AppConfig } from '../../../core/config/app.config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this.accessToken());
   readonly currentUser = computed(() => this.user());
 
-  private readonly baseUrl = 'http://localhost:8080/users/auth';
+  private readonly baseUrl = `${AppConfig.userService}/auth`;
 
   constructor(private http: HttpClient, private router: Router) {
     // Load stored tokens and user
@@ -45,6 +46,14 @@ export class AuthService {
     });
   }
 
+  updateLocalStorageUser(username: string, phoneNumber: string){
+    const storedUser = this.user(); 
+    storedUser!.username = username;
+    storedUser!.phoneNumber = phoneNumber; 
+    this.user.set(storedUser);
+    localStorage.setItem(this.USER_KEY, JSON.stringify(storedUser));
+  }
+
   /** LOGIN **/
   login(email: string, password: string) {
     return this.http
@@ -55,10 +64,6 @@ export class AuthService {
           this.refreshToken.set(res.refreshToken);
           this.user.set(res.user);
           this.router.navigate(['/']);
-        }),
-        catchError((err) => {
-          console.error('Login failed', err);
-          return of(null);
         })
       );
   }
@@ -114,7 +119,14 @@ export class AuthService {
       );
   }
   
-
+  requestPasswordReset(email: string) {
+    return this.http.post(`${this.baseUrl}/password-reset/token`, { email });
+  }
+  
+  confirmPasswordReset(token: string, newPassword: string) {
+    return this.http.post(`${this.baseUrl}/password-reset/confirm`, { token, newPassword });
+  }
+  
   getAccessToken() {
     return this.accessToken();
   }

@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, signal, computed, inject, effect } fro
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar';
 import { SidebarComponent } from './components/sidebar/sidebar';
-import { AuthService } from '../../features/auth/services/auth';
+import { AuthService } from '../../features/auth/services/auth.service';
 import { User } from '../../features/auth/models/user';
 import { CommonModule } from '@angular/common';
 

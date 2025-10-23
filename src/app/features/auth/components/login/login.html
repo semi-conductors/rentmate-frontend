@@ -1,12 +1,8 @@
 <div class="relative flex min-h-screen w-full flex-col items-center justify-center bg-[#000814] p-4 sm:p-6 lg:p-8">
   <div class="w-full max-w-md">
     <!-- Header -->
-    <div class="flex flex-col items-center mb-6">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="#FFC300" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-      <h1 class="text-[#FFC300] text-2xl font-bold mt-2">RentMate</h1>
+    <div class="text-center mb-8">
+      <h1 class="text-[#FFC300] text-4xl font-bold tracking-tight">RentMate</h1>
     </div>
 
     <!-- Card -->
@@ -29,7 +25,7 @@
             [ngModel]="email()"
             (ngModelChange)="email.set($event)"
             placeholder="Enter your email address"
-            class="form-input h-12 rounded-lg bg-[#002B5A] text-[#F9FAFB] border border-transparent focus:ring-2 focus:ring-[#FFC300]/50 placeholder-[#9CA3AF] p-3"
+            class="form-input h-12 rounded-lg bg-[#002B5A] text-[#F9FAFB] border border-transparent focus:border-[#FFC300] focus:ring-2 focus:ring-[#FFC300]/50 placeholder-[#9CA3AF] p-3 transition-all duration-150"
           />
           @if (emailRef.invalid && emailRef.touched) {
             <p class="text-[#F87171] text-sm mt-1">
@@ -41,7 +37,7 @@
         <!-- Password -->
         <label class="flex flex-col">
           <span class="text-[#F9FAFB] text-sm font-medium pb-2">Password</span>
-          <div class="flex items-stretch rounded-lg">
+          <div class="relative">
             <input
               [type]="showPassword() ? 'text' : 'password'"
               name="password"
@@ -51,17 +47,14 @@
               [ngModel]="password()"
               (ngModelChange)="password.set($event)"
               placeholder="Enter your password"
-              class="form-input h-12 flex-1 rounded-l-lg bg-[#002B5A] text-[#F9FAFB] border border-transparent border-r-0 focus:ring-2 focus:ring-[#FFC300]/50 placeholder-[#9CA3AF] p-3 pr-2"
+              class="form-input h-12 w-full rounded-lg bg-[#002952] text-[#FFFFFF] placeholder-[#9CA3AF] border-none focus:ring-2 focus:ring-[#FFC300] p-3 pr-10"
             />
-            <button
-              type="button"
+            <span
               (click)="togglePassword()"
-              class="text-[#9CA3AF] bg-[#002B5A] rounded-r-lg flex items-center justify-center pr-3 hover:text-[#F9FAFB]"
+              class="material-symbols-outlined absolute right-3 top-3 cursor-pointer text-[#9CA3AF]"
             >
-              <span class="material-symbols-outlined">
-                {{ showPassword() ? 'visibility_off' : 'visibility' }}
-              </span>
-            </button>
+              {{ showPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
           </div>
           @if (passRef.invalid && passRef.touched) {
             <p class="text-[#F87171] text-sm mt-1">
@@ -70,11 +63,18 @@
           }
         </label>
 
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="bg-[#7F1D1D] text-[#FCA5A5] text-sm p-3 rounded-lg text-center">
+            {{ errorMessage() }}
+          </div>
+        }
+
         <!-- Submit -->
         <button
           type="submit"
           [disabled]="loginForm.invalid || isLoading()"
-          class="mt-4 h-12 w-full bg-[#FFC300] text-[#001D3D] font-bold rounded-lg hover:bg-[#FFD60A] focus:outline-none focus:ring-2 focus:ring-[#FFC300]/70 focus:ring-offset-2 focus:ring-offset-[#001D3D] disabled:opacity-70 transition-colors"
+          class="mt-2 h-12 w-full bg-[#FFC300] text-[#001D3D] font-bold rounded-lg hover:bg-[#FFD60A] focus:outline-none focus:ring-2 focus:ring-[#FFC300]/70 focus:ring-offset-2 focus:ring-offset-[#001D3D] disabled:opacity-70 transition-colors"
         >
           {{ isLoading() ? 'Logging in...' : 'Login' }}
         </button>
