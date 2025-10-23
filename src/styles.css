@@ -1,1 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+/* in your global styles or component styles */
+.dropdown-container {
+  overflow: visible !important;
+  position: relative;
+  z-index: 50;
+}

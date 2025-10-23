@@ -1,111 +1,118 @@
 <div class="min-h-screen w-full bg-[#000814] text-white font-display flex justify-center p-6">
-    @if (isLoading()) {
-      <div class="text-center text-[#FFC300] text-lg font-semibold">Loading profile...</div>
-    } @else if (errorMessage()) {
-      <div class="bg-[#7F1D1D] text-[#FCA5A5] p-4 rounded-lg text-center max-w-md">
-        {{ errorMessage() }}
-      </div>
-    } @else if (profile()) {
-      <div class="max-w-3xl w-full space-y-10">
-        <!-- Header -->
-        <div class="flex flex-wrap justify-between items-center gap-4">
-          <p class="text-4xl font-black leading-tight">My Profile</p>
-          <button
-            class="h-10 px-6 bg-[#00C9A7] text-[#001D3D] font-bold rounded-lg hover:bg-[#00b395] transition-colors"
-            (click)="showEditModal.set(true)"
-          >
-            Edit Profile
-          </button>
+  @if (isLoading()) {
+  <div class="text-center text-[#FFC300] text-lg font-semibold">Loading profile...</div>
+  } @else if (errorMessage()) {
+  <div class="bg-[#7F1D1D] text-[#FCA5A5] p-4 rounded-lg text-center max-w-md">
+    {{ errorMessage() }}
+  </div>
+  } @else if (profile()) {
+  <div class="max-w-3xl w-full space-y-10">
+    <!-- Header -->
+    <div class="flex flex-wrap justify-between items-center gap-4">
+      <p class="text-4xl font-black leading-tight">My Profile</p>
+      <button
+        class="flex items-center justify-center rounded-lg h-10 px-5 border border-white/25 text-sm font-bold hover:bg-[#00FFFF] hover:text-black transition-colors"
+        (click)="showEditModal.set(true)">
+        Edit Profile
+      </button>
 
-            @if (showEditModal()) {
-                <app-edit-profile
-                    [userProfile]="profile()"
-                    (close)="showEditModal.set(false)"
-                    (updated)="onProfileUpdated($event)"
-                />
-            }
+      @if (showEditModal()) {
+      <app-edit-profile [userProfile]="profile()" (close)="showEditModal.set(false)"
+        (updated)="onProfileUpdated($event)" />
+      }
 
+      
+      <button class="h-10 px-6 bg-[#f90606] text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
+        (click)="openDeactivateModal()">
+        Deactivate Account
+      </button>
+
+      <!-- Deactivation Modal -->
+      @if (showDeactivateModal()) {
+      <app-deactivate-account-modal [loading]="deactivating()" (confirm)="deactivateAccount()"
+        (cancel)="closeDeactivateModal()" />
+      }
+
+
+    </div>
+
+    <!-- Trust Metrics -->
+    <div>
+      <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Trust Metrics</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-4">
+          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
+            <p class="text-base font-bold">User ID</p>
+            <p class="text-gray-300 text-sm">{{ profile()?.id }}</p>
+          </div>
         </div>
-  
-        <!-- Trust Metrics -->
-        <div>
-          <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Trust Metrics</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-4">
-              <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
-                <p class="text-base font-bold">User ID</p>
-                <p class="text-gray-300 text-sm">{{ profile()?.id }}</p>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
-                <p class="text-base font-bold">Average Rating</p>
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-[#FFD700]">star</span>
-                  <p class="text-gray-300 text-sm">{{ profile()?.rating?.toFixed(1) }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
-                <p class="text-base font-bold">Total Ratings</p>
-                <p class="text-gray-300 text-sm">{{ profile()?.totalRatings }}</p>
-              </div>
+        <div class="p-4">
+          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
+            <p class="text-base font-bold">Average Rating</p>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#FFD700]">star</span>
+              <p class="text-gray-300 text-sm">{{ profile()?.rating?.toFixed(1) }}</p>
             </div>
           </div>
         </div>
-  
-        <!-- Verification & Status -->
-        <div>
-          <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Verification & Status</h2>
-          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md space-y-4 mx-4">
-            <div class="flex items-center justify-between">
-              <p class="font-bold">Identity Status</p>
-              <div class="flex items-center gap-2">
-                <div
-                  class="w-3 h-3 rounded-full"
-                  [style.background-color]="profile()?.isVerified ? '#00C9A7' : '#FFC107'"
-                ></div>
-                <p [style.color]="profile()?.isVerified ? '#00C9A7' : '#FFC107'">
-                  {{ profile()?.isVerified ? 'Verified' : 'Pending' }}
-                </p>
-              </div>
-            </div>
-  
-            <div class="flex items-center justify-between">
-              <p class="font-bold">Account Activity</p>
-              <p class="text-gray-300">{{ profile()?.accountActivity }}</p>
-            </div>
-  
-            <div class="flex items-center justify-between">
-              <p class="font-bold">Member Since</p>
-              <p class="text-gray-300">{{ profile()?.memberSince }}</p>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Personal Information -->
-        <div>
-          <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Personal Information</h2>
-          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md space-y-4 mx-4">
-            <div class="flex items-center justify-between">
-              <p class="text-gray-400">Username</p>
-              <p class="font-bold">{{ profile()?.username }}</p>
-            </div>
-            <div class="flex items-center justify-between">
-              <p class="text-gray-400">Email</p>
-              <p class="font-bold">{{ profile()?.email }}</p>
-            </div>
-            <div class="flex items-center justify-between">
-              <p class="text-gray-400">Phone Number</p>
-              <p class="font-bold">{{ profile()?.phoneNumber }}</p>
-            </div>
-            <div class="flex items-center justify-between">
-              <p class="text-gray-400">Role</p>
-              <p class="font-bold">{{ profile()?.role }}</p>
-            </div>
+        <div class="p-4">
+          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
+            <p class="text-base font-bold">Total Ratings</p>
+            <p class="text-gray-300 text-sm">{{ profile()?.totalRatings }}</p>
           </div>
         </div>
       </div>
-    }
-  </div>  
+    </div>
+
+    <!-- Verification & Status -->
+    <div>
+      <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Verification & Status</h2>
+      <div class="bg-[#001F3D] rounded-lg p-6 shadow-md space-y-4 mx-4">
+        <div class="flex items-center justify-between">
+          <p class="font-bold">Identity Status</p>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full" [style.background-color]="profile()?.isVerified ? '#00C9A7' : '#FFC107'">
+            </div>
+            <p [style.color]="profile()?.isVerified ? '#00C9A7' : '#FFC107'">
+              {{ profile()?.isVerified ? 'Verified' : 'Pending' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <p class="font-bold">Account Activity</p>
+          <p class="text-gray-300">{{ profile()?.accountActivity }}</p>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <p class="font-bold">Member Since</p>
+          <p class="text-gray-300">{{ profile()?.memberSince }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div>
+      <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Personal Information</h2>
+      <div class="bg-[#001F3D] rounded-lg p-6 shadow-md space-y-4 mx-4">
+        <div class="flex items-center justify-between">
+          <p class="text-gray-400">Username</p>
+          <p class="font-bold">{{ profile()?.username }}</p>
+        </div>
+        <div class="flex items-center justify-between">
+          <p class="text-gray-400">Email</p>
+          <p class="font-bold">{{ profile()?.email }}</p>
+        </div>
+        <div class="flex items-center justify-between">
+          <p class="text-gray-400">Phone Number</p>
+          <p class="font-bold">{{ profile()?.phoneNumber }}</p>
+        </div>
+        <div class="flex items-center justify-between">
+          <p class="text-gray-400">Role</p>
+          <p class="font-bold">{{ profile()?.role }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

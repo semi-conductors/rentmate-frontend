@@ -1,0 +1,131 @@
+<main class="min-h-screen p-6 bg-[#000814] text-white">
+  @if (loadingUser()) {
+    <div class="text-gray-400">Loading user...</div>
+  } @else if (notFound()) {
+    <div class="text-red-400">User not found</div>
+  } @else {
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- LEFT column: profile card -->
+      <div class="md:col-span-1 bg-[#001D3D] rounded-lg p-6">
+        <div class="flex items-center gap-4">
+          <div class="h-16 w-16 rounded-full bg-zinc-800 flex items-center justify-center text-2xl font-bold text-[#FFC300]">
+            {{ user()?.username?.charAt(0)?.toUpperCase() }}
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold">{{ user()?.username }}</h2>
+            <p class="text-gray-300 text-sm">{{ user()?.email }}</p>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl font-bold">{{ (user()?.rating ?? 0).toFixed(1) }}</div>
+            <div class="flex items-center gap-1">
+              <span *ngFor="let s of [1,2,3,4,5]; let i = index">
+                <span class="material-symbols-outlined text-[#FFC300]" [class.text-gray-600]="i+1 > roundedRating">star</span>
+              </span>
+            </div>
+          </div>
+          <div class="text-sm text-gray-400 mt-1">{{ user()?.totalRatings ?? 0 }} ratings</div>
+        </div>
+
+        <div class="mt-6 space-y-2">
+          <!-- role & status badges -->
+          <div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                  [ngClass]="{
+                    'bg-green-800 text-green-300': user()?.accountActivity === 'ACTIVE',
+                    'bg-red-800 text-red-300': user()?.accountActivity === 'SUSPENDED_BY_ADMIN',
+                    'bg-yellow-800 text-yellow-300': user()?.role === 'ADMIN'
+                  }">
+              {{ user()?.role }} • {{ user()?.accountActivity }}
+            </span>
+          </div>
+
+          <button class="w-full mt-3 h-12 rounded-lg bg-[#FFC300] text-black font-bold" (click)="openStatusModal()">
+            Change Status / Role
+          </button>
+
+          <div class="mt-4 text-sm text-gray-300 space-y-1">
+            <div><span class="text-gray-400">Member since:</span> {{ formatDate(user()?.memberSince) }}</div>
+            <div>
+              <span class="text-gray-400">Identity:</span>
+              <span class="ml-2" [class.text-green-400]="user()?.isVerified" [class.text-red-400]="!user()?.isVerified">
+                {{ user()?.isVerified ? 'Verified' : 'Not Verified' }}
+              </span>
+            </div>
+            <div><span class="text-gray-400">Phone:</span> {{ user()?.phoneNumber ?? '-' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT column: reviews -->
+      <div class="md:col-span-2 bg-[#001D3D] rounded-lg p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold">User Performance Reviews (Received)</h3>
+            <p class="text-gray-300 text-sm">Average: <span class="font-semibold">{{ (user()?.rating ?? 0).toFixed(1) }}</span> — {{ user()?.totalRatings ?? 0 }} reviews</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1 rounded bg-[#00284D]" (click)="onRatingRefreshClick()">Refresh</button>
+          </div>
+        </div>
+
+        @if (ratingsLoading()) {
+          <div class="text-gray-400">Loading reviews...</div>
+        } @else if (ratings().length === 0) {
+          <div class="text-gray-400">No reviews found.</div>
+        } @else {
+          <div class="space-y-3">
+            @for (r of ratings(); track r.id) {
+              <div class="bg-[#021f2d] rounded-lg p-4">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="flex items-center gap-3">
+                      <button class="text-sm text-[#FFC300] font-semibold" (click)="openRaterAdmin(r.raterUserId)">
+                        {{ r.raterUserName }}
+                      </button>
+                      <div class="text-sm text-gray-400">• {{ r.createdAt | date:'yyyy-MM-dd' }}</div>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-200">{{ r.feedback || '—' }}</div>
+                  </div>
+
+                  <div class="text-right">
+                    <div class="flex justify-end mb-1">
+                      @for (i of [1,2,3,4,5]; track i) {
+                        <span class="material-symbols-outlined" [class.text-[#FFC300] ]="i <= r.rating" [class.text-gray-600]="i > r.rating">star</span>
+                      }
+                    </div>
+                    <div class="text-xs text-gray-400">ID: {{ r.id }}</div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- pagination -->
+          <div class="flex items-center justify-between mt-4">
+            <button (click)="prevRatings()" [disabled]="ratingsPage() === 1" class="px-3 py-1 rounded bg-[#00284D] disabled:opacity-50">
+              Previous
+            </button>
+            <div class="text-sm text-gray-300">Page {{ ratingsPage() }} / {{ ratingsTotalPages() }} — {{ ratingsTotalItems() }} items</div>
+            <button (click)="nextRatings()" [disabled]="ratingsPage() === ratingsTotalPages()" class="px-3 py-1 rounded bg-[#00284D] disabled:opacity-50">
+              Next
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- status modal -->
+  @if (showStatusModal()) {
+    <app-user-status-modal
+      [currentRole]="user()?.role"
+      [currentStatus]="user()?.accountActivity"
+      [currentReason]="null"
+      (save)="onSaveStatus($event)"
+      (cancel)="closeStatusModal()"
+    />
+  }
+</main>

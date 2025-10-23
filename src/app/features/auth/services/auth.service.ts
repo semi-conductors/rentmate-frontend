@@ -63,7 +63,7 @@ export class AuthService {
           this.accessToken.set(res.accessToken);
           this.refreshToken.set(res.refreshToken);
           this.user.set(res.user);
-          this.router.navigate(['/']);
+          this.router.navigate(['/']); 
         })
       );
   }
@@ -73,11 +73,15 @@ export class AuthService {
     const refreshToken = this.refreshToken();
     return this.http.post(this.baseUrl + '/logout', { refreshToken }).pipe(
       tap(() => {
-          this.accessToken.set(null);
-          this.refreshToken.set(null);
-          this.user.set(null);
-      })
-    );
+          this.localLogout();
+          this.router.navigate(['/']);
+      }), 
+      catchError((err) => {
+        console.error('Logout failed', err);
+        this.localLogout();
+        return of(null);
+      }
+    ));
   }
 
 
@@ -127,6 +131,12 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/password-reset/confirm`, { token, newPassword });
   }
   
+  localLogout(){
+    this.accessToken.set(null);
+    this.refreshToken.set(null);
+    this.user.set(null);
+  }
+
   getAccessToken() {
     return this.accessToken();
   }

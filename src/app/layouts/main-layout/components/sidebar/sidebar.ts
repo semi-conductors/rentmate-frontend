@@ -32,7 +32,7 @@ export class SidebarComponent implements OnInit {
       {
         label: 'User Management', 
         icon: 'group',
-        route: '/admin/users',
+        route: '/users',
         roles: ['ADMIN', 'MANAGER'],
       },
       { label: 'Verification Queue', icon: 'verified_user', route: '/verifications' },

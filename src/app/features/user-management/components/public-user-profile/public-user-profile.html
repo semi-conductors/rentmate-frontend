@@ -1,0 +1,99 @@
+<div class="min-h-screen flex flex-col items-center justify-center bg-[#000814] font-display text-white p-6">
+  @if (loading()) {
+    <p class="text-gray-400 text-lg">Loading user profile...</p>
+  } @else if (notFound()) {
+    <p class="text-red-400 text-lg font-semibold">User not found</p>
+  } @else {
+    <div class="max-w-[960px] w-full">
+      <div class="p-4">
+        <h1 class="text-4xl font-black tracking-[-0.033em] mb-6">
+          {{ user()?.userName }}
+        </h1>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Trust Metrics -->
+        <div class="p-4">
+          <div class="flex flex-col rounded-lg bg-[#001D3D] p-6 shadow">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[#00FFFF] text-2xl">star</span>
+              <p class="text-lg font-bold">Trust Metrics</p>
+            </div>
+
+            <div class="mt-4 flex items-center gap-2">
+              <p class="text-3xl font-bold">{{ user()?.rating?.toFixed(1) }}</p>
+              <div class="flex">
+                @for (i of [].constructor(stars().full); track i) {
+                  <span class="material-symbols-outlined text-[#00FFFF]">star</span>
+                }
+                @if (stars().half) {
+                  <span class="material-symbols-outlined text-[#00FFFF]">star_half</span>
+                }
+                @for (i of [].constructor(stars().empty); track i) {
+                  <span class="material-symbols-outlined text-gray-500">star</span>
+                }
+              </div>
+            </div>
+
+            <p class="text-[#8eadcc] text-base mt-1">
+              {{ user()?.totalRatings }} Ratings
+            </p>
+          </div>
+        </div>
+
+        <!-- Identity Status -->
+        <div class="p-4">
+          <div class="flex flex-col rounded-lg bg-[#001D3D] p-6 shadow">
+            <div class="flex items-center gap-3">
+              <span
+                class="material-symbols-outlined text-2xl"
+                [ngClass]="{
+                  'text-[#22C55E]': user()?.isVerified,
+                  'text-[#FBBF24]': !user()?.isVerified
+                }"
+                >verified_user</span
+              >
+              <p class="text-lg font-bold">Identity Status</p>
+            </div>
+
+            <div class="mt-4">
+              <p
+                class="text-3xl font-bold"
+                [ngClass]="{
+                  'text-[#22C55E]': user()?.isVerified,
+                  'text-[#FBBF24]': !user()?.isVerified
+                }"
+              >
+                {{ user()?.isVerified ? 'Verified' : 'Not Verified' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- General Information -->
+        <div class="p-4 col-span-1 md:col-span-2">
+          <div class="flex flex-col rounded-lg bg-[#001D3D] p-6 shadow">
+            <p class="text-lg font-bold mb-4">General Information</p>
+            <div class="flex flex-col gap-2">
+              <p class="text-[#8eadcc] text-base">
+                User ID: {{ user()?.id }}
+              </p>
+              <p class="text-[#8eadcc] text-base">
+                Role: {{ user()?.role }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report User Button -->
+      <div class="flex px-4 py-3 mt-4">
+        <button
+          class="flex items-center justify-center rounded-lg h-10 px-4 border border-white/20 text-sm font-bold hover:bg-[#00FFFF] hover:text-black transition-colors"
+        >
+          Report User
+        </button>
+      </div>
+    </div>
+  }
+</div>

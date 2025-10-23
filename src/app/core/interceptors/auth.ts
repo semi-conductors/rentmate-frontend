@@ -9,7 +9,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const accessToken = auth.getAccessToken();
 
-  // Attach access token if exists
+  // skip adding header if this is the refresh request
+  if (req.url.includes('/auth/refresh')) {
+    return next(req);
+  }
+
+  // Attach token
   let cloned = req;
   if (accessToken) {
     cloned = req.clone({
@@ -19,7 +24,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(cloned).pipe(
     catchError((error: HttpErrorResponse) => {
-      // If unauthorized and refresh token exists, try refreshing
       if (error.status === 401 && auth.getRefreshToken()) {
         return auth.refreshAccessToken().pipe(
           switchMap((res) => {
@@ -33,9 +37,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               auth.logout();
               return throwError(() => error);
             }
+          }),
+          catchError((refreshErr) => {
+            auth.logout();
+            return throwError(() => refreshErr);
           })
         );
       }
+
       return throwError(() => error);
     })
   );
