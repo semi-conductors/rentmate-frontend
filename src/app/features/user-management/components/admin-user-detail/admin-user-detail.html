@@ -93,7 +93,7 @@
                   <div class="text-right">
                     <div class="flex justify-end mb-1">
                       @for (i of [1,2,3,4,5]; track i) {
-                        <span class="material-symbols-outlined" [class.text-[#FFC300] ]="i <= r.rating" [class.text-gray-600]="i > r.rating">star</span>
+                        <span class="material-symbols-outlined" [class.text-[#FFC300]]="i <= r.rating" [class.text-gray-600]="i > r.rating">star</span>
                       }
                     </div>
                     <div class="text-xs text-gray-400">ID: {{ r.id }}</div>

@@ -1,118 +1,272 @@
-<div class="min-h-screen w-full bg-[#000814] text-white font-display flex justify-center p-6">
+<div class="min-h-screen w-full bg-[#000814] text-white font-['Inter',sans-serif]">
+  <!-- LOADING / ERROR STATES -->
   @if (isLoading()) {
-  <div class="text-center text-[#FFC300] text-lg font-semibold">Loading profile...</div>
+    <div class="text-center text-[#FFC300] text-lg font-semibold mt-20">Loading profile...</div>
   } @else if (errorMessage()) {
-  <div class="bg-[#7F1D1D] text-[#FCA5A5] p-4 rounded-lg text-center max-w-md">
-    {{ errorMessage() }}
-  </div>
+    <div class="bg-[#7F1D1D] text-[#FCA5A5] p-4 rounded-lg text-center max-w-md mt-20">
+      {{ errorMessage() }}
+    </div>
   } @else if (profile()) {
-  <div class="max-w-3xl w-full space-y-10">
-    <!-- Header -->
-    <div class="flex flex-wrap justify-between items-center gap-4">
-      <p class="text-4xl font-black leading-tight">My Profile</p>
-      <button
-        class="flex items-center justify-center rounded-lg h-10 px-5 border border-white/25 text-sm font-bold hover:bg-[#00FFFF] hover:text-black transition-colors"
-        (click)="showEditModal.set(true)">
-        Edit Profile
-      </button>
 
-      @if (showEditModal()) {
-      <app-edit-profile [userProfile]="profile()" (close)="showEditModal.set(false)"
-        (updated)="onProfileUpdated($event)" />
-      }
+    <!-- Modern Header with Gradient -->
+    <div class="relative bg-[#000814] py-12 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <!-- Profile Avatar & Name -->
+          <div class="flex items-center gap-6">
+            <div class="w-24 h-24 rounded-2xl bg-[#ffc300] flex items-center justify-center text-[#000814] text-4xl font-black shadow-lg">
+              {{ profile()?.username?.charAt(0)?.toUpperCase()?? 'U'}}
+            </div>
+            <div>
+              <h1 class="text-4xl font-black mb-2">{{ profile()?.username }}</h1>
+              <div class="flex items-center gap-3">
+                @if (profile()?.isVerified) {
+                  <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#ffc300]/20 text-[#ffc300] text-sm font-semibold">
+                    <span class="material-symbols-outlined text-sm">verified</span>
+                    Verified
+                  </span>
+                }
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-semibold">
+                  <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                  {{ profile()?.accountActivity }}
+                </span>
+              </div>
+            </div>
+          </div>
 
+          <!-- Action Buttons -->
+          <div class="flex gap-3">
+            <button 
+              class="flex items-center gap-2 px-5 py-3 bg-[#ffc300] text-[#000814] rounded-xl font-bold hover:bg-[#ffd700] transition-all hover:scale-105"
+              (click)="showEditModal.set(true)">
+              <span class="material-symbols-outlined text-sm">edit</span>
+              Edit Profile
+            </button>
+            <button 
+              class="flex items-center gap-2 px-5 py-3 bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl font-bold hover:bg-red-500/20 transition-colors"
+              (click)="openDeactivateModal()">
+              <span class="material-symbols-outlined text-sm">block</span>
+              Deactivate
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-6 py-10 space-y-8">
       
-      <button class="h-10 px-6 bg-[#f90606] text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
-        (click)="openDeactivateModal()">
-        Deactivate Account
-      </button>
+      <!-- Trust Metrics - Modern Cards -->
+      <div>
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#ffc300]">trending_up</span>
+          Trust Metrics
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Rating Card -->
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#ffc300] to-[#ffd700] rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+            <div class="relative bg-[#001d3d] border border-[#ffc300]/20 rounded-2xl p-6 hover:border-[#ffc300]/40 transition-all">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-400 text-sm font-medium">Average Rating</span>
+                <span class="material-symbols-outlined text-[#ffc300]">star</span>
+              </div>
+              <div class="flex items-end gap-2">
+                <p class="text-4xl font-black text-white">{{ profile()?.rating?.toFixed(1) }}</p>
+                <div class="flex">
+                  @for (i of [].constructor(stars().full); track i) {
+                    <span class="material-symbols-outlined text-[#ffc300] text-sm">star</span>
+                  }
+                  @if (stars().half) {
+                    <span class="material-symbols-outlined text-[#ffc300] text-sm">star_half</span>
+                  }
+                  @for (i of [].constructor(stars().empty); track i) {
+                    <span class="material-symbols-outlined text-gray-600 text-sm">star</span>
+                  }
+                </div>                
+              </div>
+            </div>
+          </div>
 
-      <!-- Deactivation Modal -->
-      @if (showDeactivateModal()) {
-      <app-deactivate-account-modal [loading]="deactivating()" (confirm)="deactivateAccount()"
+          <!-- Total Ratings Card -->
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a8a] to-[#001d3d] rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+            <div class="relative bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-6 hover:border-[#1e3a8a]/40 transition-all">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-400 text-sm font-medium">Total Reviews</span>
+                <span class="material-symbols-outlined text-[#1e3a8a]">reviews</span>
+              </div>
+              <div class="flex items-end gap-2">
+                <p class="text-4xl font-black text-white">{{ profile()?.totalRatings }}</p>
+                <p class="text-gray-400 text-sm mb-2">ratings</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- User ID Card -->
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+            <div class="relative bg-[#001d3d] border border-gray-600/20 rounded-2xl p-6 hover:border-gray-600/40 transition-all">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-400 text-sm font-medium">User ID</span>
+                <span class="material-symbols-outlined text-gray-400">fingerprint</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <p class="text-2xl font-mono font-bold text-white">#{{ profile()?.id }}</p>
+                <button class="text-gray-400 hover:text-[#ffc300] transition-colors">
+                  <span class="material-symbols-outlined text-sm">content_copy</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Personal Information - 2 columns -->
+        <div class="lg:col-span-2">
+          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#ffc300]">person</span>
+            Personal Information
+          </h2>
+          <div class="bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-8 space-y-6">
+            <!-- Username -->
+            <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-gray-400">badge</span>
+                <span class="text-gray-400 font-medium">Username</span>
+              </div>
+              <span class="font-bold text-white">{{ profile()?.username }}</span>
+            </div>
+
+            <!-- Email -->
+            <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-gray-400">mail</span>
+                <span class="text-gray-400 font-medium">Email</span>
+              </div>
+              <span class="font-bold text-white">{{ profile()?.email }}</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-gray-400">phone</span>
+                <span class="text-gray-400 font-medium">Phone Number</span>
+              </div>
+              <span class="font-bold text-white">{{ profile()?.phoneNumber }}</span>
+            </div>
+
+            <!-- Role -->
+            <div class="flex items-center justify-between py-4">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-gray-400">admin_panel_settings</span>
+                <span class="text-gray-400 font-medium">Role</span>
+              </div>
+              <span class="inline-flex items-center px-3 py-1 rounded-lg bg-[#1E3A8A] text-[#FFFFFF] font-bold border border-[#1e3a8a]/30">
+                {{ profile()?.role | uppercase }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification & Status - 1 column -->
+        <div class="lg:col-span-1">
+          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#ffc300]">security</span>
+            Account Status
+          </h2>
+          <div class="bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-6 space-y-6">
+            
+            <!-- Identity Status -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm font-medium">Identity</span>
+                <span class="material-symbols-outlined" [style.color]="profile()?.isVerified ? '#4ade80' : '#fbbf24'">
+                  {{ profile()?.isVerified ? 'verified_user' : 'pending' }}
+                </span>
+              </div>
+              <p [style.color]="profile()?.isVerified ? '#4ade80' : '#fbbf24'" class="text-lg font-bold">
+                {{ profile()?.isVerified ? 'Verified' : 'Unverified' }}
+              </p>
+            </div>
+
+            <div class="h-px bg-gray-700/50"></div>
+
+            <!-- Account Activity -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm font-medium">Activity</span>
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              </div>
+              <p class="text-white text-lg font-bold">{{ profile()?.accountActivity }}</p>
+            </div>
+
+            <div class="h-px bg-gray-700/50"></div>
+
+            <!-- Member Since -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm font-medium">Member Since</span>
+                <span class="material-symbols-outlined text-gray-400 text-xl">calendar_today</span>
+              </div>
+              <p class="text-white text-lg font-bold">{{ profile()?.memberSince }}</p>
+            </div>
+
+          </div>
+
+          <!-- Verification -->
+          <div class="mt-3">
+            <button 
+              class="w-full bg-[#ffc300] text-[#000814] py-3 rounded-xl font-bold hover:bg-[#ffd700] transition-all hover:scale-105"
+              [disabled]="!canSubmitVerification()"
+              (click)="onRequestVerificationClick()">
+              Start Verification
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Verification History Section -->
+      <div>
+        <app-verification-summary-table [verifications]="userVerifications()" />
+      </div>
+
+    </div>
+
+    <!-- Edit Modal -->
+    @if (showEditModal()) {
+      <app-edit-profile
+        [userProfile]="profile()"
+        (close)="showEditModal.set(false)"
+        (updated)="onProfileUpdated($event)" />
+    }
+
+    <!-- Deactivate Modal -->
+    @if (showDeactivateModal()) {
+      <app-deactivate-account-modal
+        [loading]="deactivating()"
+        (confirm)="deactivateAccount()"
         (cancel)="closeDeactivateModal()" />
-      }
+    }
 
-
-    </div>
-
-    <!-- Trust Metrics -->
-    <div>
-      <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Trust Metrics</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-4">
-          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
-            <p class="text-base font-bold">User ID</p>
-            <p class="text-gray-300 text-sm">{{ profile()?.id }}</p>
-          </div>
-        </div>
-        <div class="p-4">
-          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
-            <p class="text-base font-bold">Average Rating</p>
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[#FFD700]">star</span>
-              <p class="text-gray-300 text-sm">{{ profile()?.rating?.toFixed(1) }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="p-4">
-          <div class="bg-[#001F3D] rounded-lg p-6 shadow-md">
-            <p class="text-base font-bold">Total Ratings</p>
-            <p class="text-gray-300 text-sm">{{ profile()?.totalRatings }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Verification & Status -->
-    <div>
-      <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Verification & Status</h2>
-      <div class="bg-[#001F3D] rounded-lg p-6 shadow-md space-y-4 mx-4">
-        <div class="flex items-center justify-between">
-          <p class="font-bold">Identity Status</p>
-          <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full" [style.background-color]="profile()?.isVerified ? '#00C9A7' : '#FFC107'">
-            </div>
-            <p [style.color]="profile()?.isVerified ? '#00C9A7' : '#FFC107'">
-              {{ profile()?.isVerified ? 'Verified' : 'Pending' }}
-            </p>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <p class="font-bold">Account Activity</p>
-          <p class="text-gray-300">{{ profile()?.accountActivity }}</p>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <p class="font-bold">Member Since</p>
-          <p class="text-gray-300">{{ profile()?.memberSince }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Personal Information -->
-    <div>
-      <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Personal Information</h2>
-      <div class="bg-[#001F3D] rounded-lg p-6 shadow-md space-y-4 mx-4">
-        <div class="flex items-center justify-between">
-          <p class="text-gray-400">Username</p>
-          <p class="font-bold">{{ profile()?.username }}</p>
-        </div>
-        <div class="flex items-center justify-between">
-          <p class="text-gray-400">Email</p>
-          <p class="font-bold">{{ profile()?.email }}</p>
-        </div>
-        <div class="flex items-center justify-between">
-          <p class="text-gray-400">Phone Number</p>
-          <p class="font-bold">{{ profile()?.phoneNumber }}</p>
-        </div>
-        <div class="flex items-center justify-between">
-          <p class="text-gray-400">Role</p>
-          <p class="font-bold">{{ profile()?.role }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
   }
 </div>
+
+<style>
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+</style>

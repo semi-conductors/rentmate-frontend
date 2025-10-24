@@ -1,0 +1,71 @@
+<div class="flex flex-col min-h-screen bg-[#000814] text-white font-display p-6">
+  @if (loading()) {
+    <div class="text-center text-[#FFC300] text-lg">Loading report...</div>
+  } @else if (errorMessage()) {
+    <div class="bg-[#7F1D1D] text-[#FCA5A5] p-4 rounded-lg text-center">{{ errorMessage() }}</div>
+  } @else if (report()) {
+    <div class="max-w-6xl mx-auto space-y-6">
+      <h1 class="text-3xl font-black">Manage Report #{{ report()?.id }}</h1>
+
+      <!-- Overview -->
+      <div class="bg-[#001d3d] p-6 rounded-lg">
+        <h2 class="text-xl font-bold mb-4">Report Overview</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <p><strong>Status:</strong> {{ report()?.status }}</p>
+          <p><strong>Type:</strong> {{ report()?.reportType }}</p>
+          <p><strong>Damage:</strong> {{ report()?.damagePercentage ?? '-' }}%</p>
+          <p><strong>Submitted:</strong> {{ report()?.submittedAt }}</p>
+          <p class="col-span-2"><strong>Details:</strong> {{ report()?.details }}</p>
+        </div>
+      </div>
+
+      <!-- Reporter / Reported -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-[#001d3d] p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-2">Reporter</h3>
+          <p>{{ report()?.reporter?.username }} ({{ report()?.reporter?.email }})</p>
+          <p>Status: {{ report()?.reporter?.accountActivity }}</p>
+          <p>Rating: {{ report()?.reporter?.rating }}</p>
+        </div>
+        <div class="bg-[#001d3d] p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-2">Reported User</h3>
+          <p>{{ report()?.reported?.username }} ({{ report()?.reported?.email }})</p>
+          <p>Status: {{ report()?.reported?.accountActivity }}</p>
+          <p>Rating: {{ report()?.reported?.rating }}</p>
+        </div>
+      </div>
+
+      <!-- Resolution Panel -->
+      <div class="bg-[#001d3d] p-6 rounded-lg">
+        <h3 class="text-lg font-bold mb-4">Resolution Panel</h3>
+        <textarea
+          [(ngModel)]="message"
+          placeholder="Resolution message..."
+          class="w-full rounded-lg p-3 bg-[#000814] border border-[#003566]"
+          rows="4"
+        ></textarea>
+        <div class="flex gap-3 mt-4">
+          <button class="flex-1 bg-[#FFC300] text-black font-bold rounded-lg py-2" (click)="onResolve()">
+            Resolve
+          </button>
+          <button class="flex-1 bg-gray-500 text-white font-bold rounded-lg py-2" (click)="onDismiss()">
+            Dismiss
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Actions -->
+      <div class="bg-[#001d3d] p-6 rounded-lg">
+        <h3 class="text-lg font-bold mb-4">Admin Actions</h3>
+        <div class="flex flex-col gap-3">
+          <button class="bg-red-600 hover:bg-red-700 py-2 rounded-lg font-semibold" (click)="onSuspend()">
+            Suspend Reported User
+          </button>
+          <button class="border border-[#FFC300] text-[#FFC300] py-2 rounded-lg font-semibold" (click)="onWithdraw()">
+            Withdraw Money from Reported User
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

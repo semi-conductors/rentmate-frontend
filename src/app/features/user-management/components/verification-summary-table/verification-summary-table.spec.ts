@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SidebarComponent } from './sidebar';
+import { VerificationSummaryTable } from './verification-summary-table';
 
-describe('Sidebar', () => {
-  let component: SidebarComponent;
-  let fixture: ComponentFixture<SidebarComponent>;
+describe('VerificationSummaryTable', () => {
+  let component: VerificationSummaryTable;
+  let fixture: ComponentFixture<VerificationSummaryTable>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SidebarComponent]
+      imports: [VerificationSummaryTable]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SidebarComponent);
+    fixture = TestBed.createComponent(VerificationSummaryTable);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

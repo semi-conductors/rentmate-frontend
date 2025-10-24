@@ -1,0 +1,97 @@
+<div class="flex flex-col p-4 mt-8">
+  <details class="flex flex-col border-t border-t-[#2f466a] py-2 group" open>
+    <summary
+      class="flex cursor-pointer items-center justify-between gap-6 py-2 select-none"
+    >
+      <p class="text-white text-lg font-medium leading-normal">
+        Submission History
+      </p>
+      <span
+        class="material-symbols-outlined text-white group-open:rotate-180 transition-transform"
+        >expand_more</span
+      >
+    </summary>
+
+    <div class="py-2">
+      <div
+        class="flex overflow-hidden rounded-lg border border-[#2f466a] bg-[#101723]"
+      >
+        <table class="w-full">
+          <thead>
+            <tr class="bg-[#182335]">
+              <th
+                class="px-4 py-3 text-left text-white text-sm font-medium leading-normal"
+              >
+                Verification ID
+              </th>
+              <th
+                class="px-4 py-3 text-left text-white text-sm font-medium leading-normal"
+              >
+                Status
+              </th>
+              <th
+                class="px-4 py-3 text-left text-white text-sm font-medium leading-normal"
+              >
+                Submitted On
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @if (verifications()?.length ?? 0) {
+              @for (v of verifications(); track v.id) {
+                <tr class="border-t border-t-[#2f466a]">
+                  <td
+                    class="h-[72px] px-4 py-2 text-[#8ea6cc] text-sm font-normal"
+                  >
+                    #{{ v.id }}
+                  </td>
+
+                  <td
+                    class="h-[72px] px-4 py-2 text-sm font-normal leading-normal"
+                  >
+                    @switch (v.status) {
+                      @case ('APPROVED') {
+                        <span
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#39739d]/20 text-[#39739d]"
+                          >APPROVED</span
+                        >
+                      }
+                      @case ('REJECTED') {
+                        <span
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#dc3545]/20 text-[#dc3545]"
+                          >REJECTED</span
+                        >
+                      }
+                      @default {
+                        <span
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#ffc300]/20 text-[#ffc300]"
+                          >PENDING</span
+                        >
+                      }
+                    }
+                  </td>
+
+                  <td
+                    class="h-[72px] px-4 py-2 text-[#8ea6cc] text-sm font-normal"
+                  >
+                    {{ v.submittedAt | date: 'yyyy-MM-dd hh:mm a' }}
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr class="border-t border-t-[#2f466a]">
+                <td
+                  colspan="5"
+                  class="h-[72px] text-center text-[#8ea6cc] text-sm font-normal"
+                >
+                  No previous submission history.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+</div>

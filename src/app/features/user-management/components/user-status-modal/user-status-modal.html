@@ -1,36 +1,52 @@
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" (click)="onCancel()">
-    <div class="bg-[#001D3D] rounded-lg p-6 w-full max-w-md" (click)="$event.stopPropagation()">
-      <h3 class="text-xl font-bold mb-3">Change Status & Role</h3>
-      <p class="text-sm text-gray-300 mb-4">Update account status, role or add a suspension reason.</p>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" (click)="onCancel()">
+  <div class="bg-[#001D3D] rounded-lg p-6 w-full max-w-md" (click)="$event.stopPropagation()">
+    <h3 class="text-xl font-bold mb-3">Change Status & Role</h3>
+    <p class="text-sm text-gray-300 mb-4">Update account status, role or add a suspension reason.</p>
 
-      <label class="block mb-3">
-        <span class="text-sm text-gray-200">Role</span>
-        <select class="w-full mt-1 p-2 rounded bg-[#021e2f]" [value]="localRole()">
-          <option value="USER">User</option>
-          <option value="DELIVERY_GUY">Delivery Guy</option>
-          <option value="ADMIN">Admin</option>
-          <option value="MANAGER">Manager</option>
-        </select>
-      </label>
+    <!-- Role -->
+    <label class="block mb-3">
+      <span class="text-sm text-gray-200">Role</span>
+      <select
+        class="w-full mt-1 p-2 rounded bg-[#021e2f]"
+        [value]="localRole()"
+        (change)="onRoleChange($event.target)"
+      >
+        <option value="USER">User</option>
+        <option value="DELIVERY_GUY">Delivery Guy</option>
+        <option value="ADMIN">Admin</option>
+        <option value="MANAGER">Manager</option>
+      </select>
+    </label>
 
-      <label class="block mb-3">
-        <span class="text-sm text-gray-200">Account Status</span>
-        <select class="w-full mt-1 p-2 rounded bg-[#021e2f]" [value]="localStatus()">
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
-          <option value="PENDING_REPORT_REVIEW">Pending Report Review</option>
-          <option value="SUSPENDED_BY_ADMIN">Suspended by Admin</option>
-        </select>
-      </label>
+    <!-- Status -->
+    <label class="block mb-3">
+      <span class="text-sm text-gray-200">Account Status</span>
+      <select
+        class="w-full mt-1 p-2 rounded bg-[#021e2f]"
+        [value]="localStatus()"
+        (change)="onStatusChange($event.target)"
+      >
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+        <option value="PENDING_REPORT_REVIEW">Pending Report Review</option>
+        <option value="SUSPENDED_BY_ADMIN">Suspended by Admin</option>
+      </select>
+    </label>
 
-      <label class="block mb-4">
-        <span class="text-sm text-gray-200">Suspension Reason (optional)</span>
-        <textarea class="w-full mt-1 p-2 rounded bg-[#021e2f]" rows="3" [value]="reason()" ></textarea>
-      </label>
+    <!-- Reason -->
+    <label class="block mb-4">
+      <span class="text-sm text-gray-200">Suspension Reason (optional)</span>
+      <textarea
+        class="w-full mt-1 p-2 rounded bg-[#021e2f]"
+        rows="3"
+        [value]="reason()"
+        (input)="onReasonChange($event.target)"
+      ></textarea>
+    </label>
 
-      <div class="flex gap-3 justify-end">
-        <button class="px-4 py-2 rounded bg-zinc-700" (click)="onCancel()">Cancel</button>
-        <button class="px-4 py-2 rounded bg-[#FFC300] text-black font-semibold" (click)="onConfirm()">Save</button>
-      </div>
+    <div class="flex gap-3 justify-end">
+      <button class="px-4 py-2 rounded bg-zinc-700" (click)="onCancel()">Cancel</button>
+      <button class="px-4 py-2 rounded bg-[#FFC300] text-black font-semibold" (click)="onConfirm()">Save</button>
     </div>
   </div>
+</div>

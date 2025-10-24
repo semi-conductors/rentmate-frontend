@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SidebarComponent } from './sidebar';
+import { VerificationRequest } from './verification-request';
 
-describe('Sidebar', () => {
-  let component: SidebarComponent;
-  let fixture: ComponentFixture<SidebarComponent>;
+describe('VerificationRequest', () => {
+  let component: VerificationRequest;
+  let fixture: ComponentFixture<VerificationRequest>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SidebarComponent]
+      imports: [VerificationRequest]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SidebarComponent);
+    fixture = TestBed.createComponent(VerificationRequest);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

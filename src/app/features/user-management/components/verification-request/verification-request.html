@@ -1,0 +1,103 @@
+<div
+  class="relative flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 lg:p-8"
+>
+  <div class="w-full max-w-2xl">
+    <div class="bg-[#001D3D] p-6 sm:p-8 rounded-xl shadow-2xl">
+      <div class="flex flex-wrap justify-between gap-3 mb-6">
+        <p class="text-white text-3xl font-black leading-tight tracking-tight">
+          Identity Verification
+        </p>
+      </div>
+
+      <form class="space-y-6" (submit)="onSubmit(); $event.preventDefault()">
+        <!-- ID Number -->
+        <label class="flex flex-col">
+          <p class="text-white/90 text-sm font-medium pb-2">
+            National Identity Number
+          </p>
+          <input
+            type="text"
+            class="form-input w-full rounded-lg bg-[#002952] text-white/80 border border-white/20 h-12 px-3 focus:ring-2 focus:ring-[#FFC300]/50 focus:border-[#FFC300]"
+            placeholder="Enter National Identity Number"
+            [value]="idNumber()"
+            (input)="idNumber.set($event.target.value)"
+          />
+        </label>
+
+        <!-- Uploads -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Front -->
+          <div class="space-y-2">
+            <p class="text-white/90 text-sm font-medium leading-normal">
+              Front of ID
+            </p>
+            <div
+              class="relative border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-[#FFC300]/50 transition-colors"
+            >
+              <div class="flex flex-col items-center justify-center h-32">
+                <span
+                  class="material-symbols-outlined text-4xl text-white/40"
+                  >upload_file</span
+                >
+                <p class="mt-2 text-sm text-white/60">
+                  {{
+                    idFrontFile()
+                      ? idFrontFile()!.name
+                      : 'Drag & drop or click to upload'
+                  }}
+                </p>
+                <p class="text-xs text-white/40">PNG, JPG, up to 5MB</p>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                (change)="onFileSelect($event, 'front')"
+              />
+            </div>
+          </div>
+
+          <!-- Back -->
+          <div class="space-y-2">
+            <p class="text-white/90 text-sm font-medium leading-normal">
+              Back of ID
+            </p>
+            <div
+              class="relative border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-[#FFC300]/50 transition-colors"
+            >
+              <div class="flex flex-col items-center justify-center h-32">
+                <span
+                  class="material-symbols-outlined text-4xl text-white/40"
+                  >upload_file</span
+                >
+                <p class="mt-2 text-sm text-white/60">
+                  {{
+                    idBackFile()
+                      ? idBackFile()!.name
+                      : 'Drag & drop or click to upload'
+                  }}
+                </p>
+                <p class="text-xs text-white/40">PNG, JPG, up to 5MB</p>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                (change)="onFileSelect($event, 'back')"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="w-full bg-[#FFC300] text-[#001D3D] font-bold py-3 px-4 rounded-lg hover:bg-[#FFD60A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#001D3D] focus:ring-[#FFC300] disabled:bg-[#FFC300]/50 disabled:cursor-not-allowed transition-colors"
+          [disabled]="isDisabled"
+        >
+          {{ isSubmitting() ? 'Submitting...' : 'Submit Verification Request' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

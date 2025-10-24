@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SidebarComponent } from './sidebar';
+import { VerificationQueue } from './verification-queue';
 
-describe('Sidebar', () => {
-  let component: SidebarComponent;
-  let fixture: ComponentFixture<SidebarComponent>;
+describe('VerificationQueue', () => {
+  let component: VerificationQueue;
+  let fixture: ComponentFixture<VerificationQueue>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SidebarComponent]
+      imports: [VerificationQueue]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SidebarComponent);
+    fixture = TestBed.createComponent(VerificationQueue);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

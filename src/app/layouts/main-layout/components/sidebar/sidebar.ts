@@ -35,8 +35,8 @@ export class SidebarComponent implements OnInit {
         route: '/users',
         roles: ['ADMIN', 'MANAGER'],
       },
-      { label: 'Verification Queue', icon: 'verified_user', route: '/verifications' },
-      { label: 'Reports Dashboard', icon: 'bar_chart', route: '/reports' },
+      { label: 'Verification Queue', icon: 'verified_user', route: '/verification-queue' },
+      { label: 'Reports Dashboard', icon: 'bar_chart', route: 'admin/reports' },
     ]);
   }
 

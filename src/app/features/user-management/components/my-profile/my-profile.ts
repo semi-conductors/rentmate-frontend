@@ -6,18 +6,23 @@ import { EditProfileComponent } from "../edit-profile/edit-profile";
 import { AuthService } from '../../../auth/services/auth.service';
 import { DeactivateAccountModalComponent } from "../deactivate-account-modal/deactivate-account-modal";
 import { Router } from '@angular/router';
+import { VerificationResponse } from '../../models/verification.response';
+import { VerificationService } from '../../services/verification.service';
+import { VerificationSummaryTableComponent } from "../verification-summary-table/verification-summary-table";
 
 
 @Component({
   standalone: true,
   selector: 'app-my-profile',
-  imports: [CommonModule, EditProfileComponent, DeactivateAccountModalComponent],
+  imports: [CommonModule, EditProfileComponent, DeactivateAccountModalComponent, VerificationSummaryTableComponent],
   templateUrl: './my-profile.html',
   styleUrl: './my-profile.css'
 })
 export class MyProfileComponent implements OnInit {
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private verificationService = inject(VerificationService);
+
   private router = inject(Router); 
 
   showEditModal = signal(false);
@@ -26,6 +31,8 @@ export class MyProfileComponent implements OnInit {
   errorMessage = signal('');
   showDeactivateModal = signal(false);
   deactivating = signal(false);
+  userVerifications = signal<VerificationResponse[]>([]);
+  canSubmitVerification = signal(true);
 
   ngOnInit(): void {
     this.userService.getProfile().subscribe({
@@ -37,6 +44,24 @@ export class MyProfileComponent implements OnInit {
         this.errorMessage.set(err.message || 'Error loading profile');
         this.isLoading.set(false);
       },
+    });
+
+    this.verificationService.getMyVerifications().subscribe({
+      next: res => {
+        this.userVerifications.set(res);
+      },
+      error: err => {
+        console.error('Error loading verifications:', err);
+      }
+    });
+
+    this.verificationService.canSubmitVerification().subscribe({
+      next: res => {
+        this.canSubmitVerification.set(res.canSubmit);  
+      },
+      error: err => {
+        console.error('Error checking verification submission eligibility:', err);
+      }
     });
   }
 
@@ -66,5 +91,18 @@ export class MyProfileComponent implements OnInit {
         this.deactivating.set(false);
       },
     });
+  }
+
+  onRequestVerificationClick(){
+    if(!this.canSubmitVerification) 
+      return;
+    this.router.navigate(['/verification-request']);
+  }
+
+  stars() {
+    const rating = this.profile()?.rating ?? 0;
+    const full = Math.floor(rating);
+    const half = rating % 1 >= 0.5;
+    return { full, half, empty: 5 - full - (half ? 1 : 0) };
   }
 }

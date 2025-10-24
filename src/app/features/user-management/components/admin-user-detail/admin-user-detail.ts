@@ -110,13 +110,34 @@ export class AdminUserDetailComponent implements OnInit{
 
   // Save status/role (parent orchestrates)
   onSaveStatus(payload: { role: string; status: string; reason?: string }) {
-    // call API e.g. this.userService.updateUserAdmin(userId, payload) — left as TODO
-    // For now just close and reflect locally:
+    console.log('save method called');
+    
     const u = this.user();
     if (!u) return;
-    this.user.set({ ...u, role: payload.role, accountActivity: payload.status });
-    this.showStatusModal.set(false);
-    // TODO: call backend to persist change and show toast
+    console.log('user is ' + JSON.stringify(u));
+    console.log('payload is ' + JSON.stringify(payload));
+
+    if (u.role !== payload.role) {
+      this.userService.changeUserRole(u.id, payload.role).subscribe({
+        next: (res) => {
+          this.user.set(res);
+        }, error: (err) => {
+          console.error('Failed to change role:', err);
+        }
+      });
+    }
+
+    if (u.accountActivity !== payload.status) {
+      this.userService.changeUserStatus(u.id, payload.status, payload.reason).subscribe({
+        next: (res: UserProfile) => {
+          this.user.set(res);
+        }, error: (err) => {
+          console.error('Failed to change status:', err);
+        }
+      });
+    }
+
+    this.showStatusModal.set(false);  
   }
 
   formatDate(iso?: string) {

@@ -68,4 +68,11 @@ export class UserService {
     return this.http.get<RatingListResponse>(`${this.baseUrl}/${userId}/ratings`, { params });
   }
 
+  changeUserStatus(userId: number, status: string, reason?: string): Observable<UserProfile> {
+    return this.http.patch<UserProfile>(`${this.baseUrl}/${userId}/status`, { status, reason });
+  }
+
+  changeUserRole(userId: number, role: string): Observable<UserProfile> {
+    return this.http.patch<UserProfile>(`${this.baseUrl}/${userId}/role`, { role });
+  }
 }

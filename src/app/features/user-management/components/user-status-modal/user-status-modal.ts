@@ -18,19 +18,33 @@ export class UserStatusModalComponent implements OnInit {
   cancel = output<void>();
 
   // local editable signals
-  localRole = signal<string | null>(this.currentRole?.()??null);
-  localStatus = signal<string | null>(this.currentStatus?.()??null);
-  reason = signal<string | null>(this.currentReason?.()??null);
+  localRole = signal<string | null>(null);
+  localStatus = signal<string | null>(null);
+  reason = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.localRole = signal<string | null>(this.currentRole?.()??null);
-    this.localStatus = signal<string | null>(this.currentStatus?.()??null);
-    this.reason = signal<string | null>(this.currentReason?.()??null);
+    this.localRole.set(this.currentRole?.()??null);
+    this.localStatus.set(this.currentStatus?.()??null);
+    this.reason.set(this.currentReason?.()??null);
   }
+
   onConfirm() {
     this.save.emit({ role: this.localRole()??'', status: this.localStatus()??'', reason: this.reason() ?? undefined });
   }
   onCancel() {
     this.cancel.emit();
+  }
+
+  onRoleChange(eventTarget: EventTarget | null) {
+    const value = (eventTarget as HTMLSelectElement).value;
+    this.localRole.set(value);
+  }
+  onStatusChange(eventTarget: EventTarget | null) {
+    const value = (eventTarget as HTMLSelectElement).value;
+    this.localStatus.set(value);
+  }
+  onReasonChange(eventTarget: EventTarget | null) {
+    const value = (eventTarget as HTMLTextAreaElement).value;
+    this.reason.set(value);
   }
 }
