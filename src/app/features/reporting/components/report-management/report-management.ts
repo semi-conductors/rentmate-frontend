@@ -4,11 +4,13 @@ import { interval, Subscription } from 'rxjs';
 import { ReportService } from '../../services/report.service';
 import { ReportDetailsResponse } from '../../models/report.details.response';
 import { FormsModule } from '@angular/forms';
+import { DatePipe, NgClass } from '@angular/common';
+import { SpaceifyPipe } from '../../../../core/pipes/specify-pipe';
 
 @Component({
   selector: 'app-report-management',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe, NgClass, SpaceifyPipe],
   templateUrl: './report-management.html',
 })
 export class ReportManagementComponent implements OnInit, OnDestroy {
@@ -96,4 +98,23 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     await this.releaseLock();
     window.removeEventListener('beforeunload', this.releaseLock);
   }
+
+  viewProfile(userId: number | undefined) {
+    if (!userId) return;
+    this.router.navigate(['/admin/users', userId])
+  }
+  getStatusClass(status: string): string {
+    const base = 'px-2.5 py-1 rounded-full text-xs font-bold';
+    switch (status) {
+      case 'PENDING': return `${base} bg-yellow-500/80 text-black`;
+      case 'UNDER_REVIEW': return `${base} bg-blue-500/80 text-white`;
+      case 'RESOLVED': return `${base} bg-green-600/80 text-white`;
+      case 'DISMISSED': return `${base} bg-gray-500/80 text-white`;
+      case 'ACTIVE': return `${base} bg-green-600/80 text-white`;
+      case 'INACTIVE': return `${base} bg-gray-600/80 text-white`;
+      case 'PENDING_REPORT_REVIEW': return `${base} bg-blue-500/80 text-white`;
+      case 'SUSPENDED_BY_ADMIN': return `${base} bg-red-600/80 text-white`;
+      default: return `${base} bg-neutral-600 text-white`;
+    }
+  }  
 }

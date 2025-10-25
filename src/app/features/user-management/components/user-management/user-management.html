@@ -144,7 +144,7 @@
                       'bg-yellow-500/20 text-yellow-300': user.accountActivity === 'SUSPENDED_BY_ADMIN'
                     }"
                   >
-                    {{ user.accountActivity }}
+                    {{ user.accountActivity | spaceify }}
                   </span>
                 </td>
                 <td class="px-4 py-3 flex items-center gap-1"

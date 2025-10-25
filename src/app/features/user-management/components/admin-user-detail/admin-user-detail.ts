@@ -6,11 +6,12 @@ import { UserProfile } from '../../models/user.profile';
 import { RatingDto, RatingListResponse } from '../../../rating/models/rating.model';
 import { UserStatusModalComponent } from '../user-status-modal/user-status-modal';
 import { formatDate } from '@angular/common';
+import { SpaceifyPipe } from '../../../../core/pipes/specify-pipe';
 
 @Component({
   selector: 'app-admin-user-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, UserStatusModalComponent],
+  imports: [CommonModule, RouterModule, UserStatusModalComponent, SpaceifyPipe],
   templateUrl: './admin-user-detail.html',
 })
 export class AdminUserDetailComponent implements OnInit{
@@ -33,23 +34,6 @@ export class AdminUserDetailComponent implements OnInit{
   // Modal
   showStatusModal = signal(false);
 
-  // constructor() {
-  //   // load user when route param changes
-  //   effect(() => {
-  //     const id = Number(this.route.snapshot.paramMap.get('id'));
-  //     if (!id) return;
-  //     this.loadUser(id);
-  //     this.loadRatings(id, this.ratingsPage(), this.ratingsLimit());
-  //   });
-
-  //   // reload ratings when page changes
-  //   effect(() => {
-  //     const id = Number(this.route.snapshot.paramMap.get('id'));
-  //     if (!id) return;
-  //     // subscribe when page signal changes
-  //     this.loadRatings(id, this.ratingsPage(), this.ratingsLimit());
-  //   });
-  // }
   
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));

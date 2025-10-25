@@ -1,65 +1,100 @@
-<div class="min-h-screen w-full bg-[#000814] text-white font-['Inter',sans-serif]">
+<div class="min-h-screen w-full bg-[#000814] text-white font-['Inter',sans-serif] p-3">
   <!-- LOADING / ERROR STATES -->
   @if (isLoading()) {
-    <div class="text-center text-[#FFC300] text-lg font-semibold mt-20">Loading profile...</div>
+    <div class="flex items-center justify-center min-h-[400px]">
+      <div class="text-center">
+        <div class="text-[#FFC300] text-lg mb-2">Loading profile...</div>
+        <div class="text-gray-400 text-sm">Please wait</div>
+      </div>
+    </div>
   } @else if (errorMessage()) {
-    <div class="bg-[#7F1D1D] text-[#FCA5A5] p-4 rounded-lg text-center max-w-md mt-20">
-      {{ errorMessage() }}
+    <div class="max-w-2xl mx-auto mt-8">
+      <div class="bg-[#7F1D1D] border border-red-500 text-[#FCA5A5] p-6 rounded-xl text-center">
+        <span class="material-symbols-outlined text-5xl mb-3">error</span>
+        <div class="text-lg font-semibold">{{ errorMessage() }}</div>
+      </div>
     </div>
   } @else if (profile()) {
 
-    <!-- Modern Header with Gradient -->
-    <div class="relative bg-[#000814] py-12 px-6">
-      <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto space-y-6">
+      <!-- Modern Header with Gradient -->
+      <div class="bg-gradient-to-r from-[#001D3D] to-[#1e3a8a] rounded-xl p-8 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <!-- Profile Avatar & Name -->
           <div class="flex items-center gap-6">
-            <div class="w-24 h-24 rounded-2xl bg-[#ffc300] flex items-center justify-center text-[#000814] text-4xl font-black shadow-lg">
-              {{ profile()?.username?.charAt(0)?.toUpperCase()?? 'U'}}
+            <div class="w-28 h-28 rounded-2xl bg-[#ffc300] flex items-center justify-center text-[#000814] text-5xl font-black shadow-lg">
+              {{ profile()?.username?.charAt(0)?.toUpperCase() ?? 'U' }}
             </div>
             <div>
-              <h1 class="text-4xl font-black mb-2">{{ profile()?.username }}</h1>
-              <div class="flex items-center gap-3">
+              <h1 class="text-4xl font-black mb-3">{{ profile()?.username }}</h1>
+              <div class="flex flex-wrap items-center gap-3">
                 @if (profile()?.isVerified) {
-                  <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#ffc300]/20 text-[#ffc300] text-sm font-semibold">
+                  <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-900/50 text-green-300 text-sm font-semibold border border-green-500/30">
                     <span class="material-symbols-outlined text-sm">verified</span>
-                    Verified
+                    Verified Identity
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-900/50 text-yellow-300 text-sm font-semibold border border-yellow-500/30">
+                    <span class="material-symbols-outlined text-sm">gpp_maybe</span>
+                    Not Verified
                   </span>
                 }
-                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-semibold">
-                  <span class="w-2 h-2 bg-green-400 rounded-full"></span>
-                  {{ profile()?.accountActivity }}
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+                      [ngClass]="{
+                        'bg-green-900/50 text-green-300 border border-green-500/30': profile()?.accountActivity === 'ACTIVE',
+                        'bg-gray-900/50 text-gray-300 border border-gray-500/30': profile()?.accountActivity === 'INACTIVE',
+                        'bg-yellow-900/50 text-yellow-300 border border-yellow-500/30': profile()?.accountActivity === 'PENDING_REPORT_REVIEW',
+                        'bg-red-900/50 text-red-300 border border-red-500/30': profile()?.accountActivity === 'SUSPENDED_BY_ADMIN'
+                      }">
+                  <span class="w-2 h-2 rounded-full" 
+                        [ngClass]="{
+                          'bg-green-400': profile()?.accountActivity === 'ACTIVE',
+                          'bg-gray-400': profile()?.accountActivity === 'INACTIVE',
+                          'bg-yellow-400': profile()?.accountActivity === 'PENDING_REPORT_REVIEW',
+                          'bg-red-400': profile()?.accountActivity === 'SUSPENDED_BY_ADMIN'
+                        }"></span>
+                  {{ profile()?.accountActivity | spaceify}}
+                </span>
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+                      [ngClass]="{
+                        'bg-purple-900/50 text-purple-300 border border-purple-500/30': profile()?.role === 'ADMIN',
+                        'bg-orange-900/50 text-orange-300 border border-orange-500/30': profile()?.role === 'MANAGER',
+                        'bg-blue-900/50 text-blue-300 border border-blue-500/30': profile()?.role === 'DELIVERY_GUY',
+                        'bg-gray-900/50 text-gray-300 border border-gray-500/30': profile()?.role === 'USER'
+                      }">
+                  <span class="material-symbols-outlined text-sm">
+                    {{ profile()?.role === 'ADMIN' ? 'admin_panel_settings' : 
+                       profile()?.role === 'MANAGER' ? 'supervised_user_circle' :
+                       profile()?.role === 'DELIVERY_GUY' ? 'local_shipping' : 'person' }}
+                  </span>
+                  {{ profile()?.role }}
                 </span>
               </div>
             </div>
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex gap-3">
+          <div class="flex flex-wrap gap-3">
             <button 
-              class="flex items-center gap-2 px-5 py-3 bg-[#ffc300] text-[#000814] rounded-xl font-bold hover:bg-[#ffd700] transition-all hover:scale-105"
+              class="flex items-center gap-2 px-6 py-3 bg-[#ffc300] text-[#000814] rounded-xl font-bold hover:bg-[#ffd700] transition-all hover:scale-105 shadow-lg"
               (click)="showEditModal.set(true)">
-              <span class="material-symbols-outlined text-sm">edit</span>
+              <span class="material-symbols-outlined">edit</span>
               Edit Profile
             </button>
             <button 
-              class="flex items-center gap-2 px-5 py-3 bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl font-bold hover:bg-red-500/20 transition-colors"
+              class="flex items-center gap-2 px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/50 rounded-xl font-bold hover:bg-red-500/30 transition-colors"
               (click)="openDeactivateModal()">
-              <span class="material-symbols-outlined text-sm">block</span>
+              <span class="material-symbols-outlined">block</span>
               Deactivate
             </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="max-w-6xl mx-auto px-6 py-10 space-y-8">
-      
       <!-- Trust Metrics - Modern Cards -->
       <div>
-        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-          <span class="material-symbols-outlined text-[#ffc300]">trending_up</span>
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+          <span class="material-symbols-outlined text-[#ffc300] text-3xl">trending_up</span>
           Trust Metrics
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -71,19 +106,20 @@
                 <span class="text-gray-400 text-sm font-medium">Average Rating</span>
                 <span class="material-symbols-outlined text-[#ffc300]">star</span>
               </div>
-              <div class="flex items-end gap-2">
-                <p class="text-4xl font-black text-white">{{ profile()?.rating?.toFixed(1) }}</p>
-                <div class="flex">
-                  @for (i of [].constructor(stars().full); track i) {
-                    <span class="material-symbols-outlined text-[#ffc300] text-sm">star</span>
-                  }
-                  @if (stars().half) {
-                    <span class="material-symbols-outlined text-[#ffc300] text-sm">star_half</span>
-                  }
-                  @for (i of [].constructor(stars().empty); track i) {
-                    <span class="material-symbols-outlined text-gray-600 text-sm">star</span>
-                  }
-                </div>                
+              <div class="flex items-baseline gap-3 mb-2">
+                <p class="text-5xl font-black text-white">{{ profile()?.rating?.toFixed(1) }}</p>
+                <p class="text-gray-400 text-lg">/5.0</p>
+              </div>
+              <div class="flex">
+                @for (i of [].constructor(stars().full); track i) {
+                  <span class="material-symbols-outlined text-[#ffc300] text-xl">star</span>
+                }
+                @if (stars().half) {
+                  <span class="material-symbols-outlined text-[#ffc300] text-xl">star_half</span>
+                }
+                @for (i of [].constructor(stars().empty); track i) {
+                  <span class="material-symbols-outlined text-gray-600 text-xl">star</span>
+                }
               </div>
             </div>
           </div>
@@ -94,11 +130,11 @@
             <div class="relative bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-6 hover:border-[#1e3a8a]/40 transition-all">
               <div class="flex items-center justify-between mb-4">
                 <span class="text-gray-400 text-sm font-medium">Total Reviews</span>
-                <span class="material-symbols-outlined text-[#1e3a8a]">reviews</span>
+                <span class="material-symbols-outlined text-blue-400">reviews</span>
               </div>
-              <div class="flex items-end gap-2">
-                <p class="text-4xl font-black text-white">{{ profile()?.totalRatings }}</p>
-                <p class="text-gray-400 text-sm mb-2">ratings</p>
+              <div class="flex items-baseline gap-3">
+                <p class="text-5xl font-black text-white">{{ profile()?.totalRatings }}</p>
+                <p class="text-gray-400 text-lg">reviews</p>
               </div>
             </div>
           </div>
@@ -111,10 +147,10 @@
                 <span class="text-gray-400 text-sm font-medium">User ID</span>
                 <span class="material-symbols-outlined text-gray-400">fingerprint</span>
               </div>
-              <div class="flex items-center gap-2">
-                <p class="text-2xl font-mono font-bold text-white">#{{ profile()?.id }}</p>
-                <button class="text-gray-400 hover:text-[#ffc300] transition-colors">
-                  <span class="material-symbols-outlined text-sm">content_copy</span>
+              <div class="flex items-center gap-3">
+                <p class="text-3xl font-mono font-black text-white">#{{ profile()?.id }}</p>
+                <button class="text-gray-400 hover:text-[#ffc300] transition-colors p-2 rounded-lg hover:bg-gray-700/30">
+                  <span class="material-symbols-outlined">content_copy</span>
                 </button>
               </div>
             </div>
@@ -123,115 +159,234 @@
       </div>
 
       <!-- Two Column Layout -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Personal Information - 2 columns -->
-        <div class="lg:col-span-2">
-          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[#ffc300]">person</span>
-            Personal Information
-          </h2>
-          <div class="bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-8 space-y-6">
-            <!-- Username -->
-            <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-gray-400">badge</span>
-                <span class="text-gray-400 font-medium">Username</span>
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Personal Info Card -->
+          <div>
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+              <span class="material-symbols-outlined text-[#ffc300] text-3xl">person</span>
+              Personal Information
+            </h2>
+            <div class="bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-8 space-y-6">
+              <!-- Username -->
+              <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-gray-400">badge</span>
+                  <span class="text-gray-400 font-medium">Username</span>
+                </div>
+                <span class="font-bold text-white text-lg">{{ profile()?.username }}</span>
               </div>
-              <span class="font-bold text-white">{{ profile()?.username }}</span>
-            </div>
 
-            <!-- Email -->
-            <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-gray-400">mail</span>
-                <span class="text-gray-400 font-medium">Email</span>
+              <!-- Email -->
+              <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-gray-400">mail</span>
+                  <span class="text-gray-400 font-medium">Email</span>
+                </div>
+                <span class="font-bold text-white text-lg break-all">{{ profile()?.email }}</span>
               </div>
-              <span class="font-bold text-white">{{ profile()?.email }}</span>
-            </div>
 
-            <!-- Phone -->
-            <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-gray-400">phone</span>
-                <span class="text-gray-400 font-medium">Phone Number</span>
+              <!-- Phone -->
+              <div class="flex items-center justify-between py-4 border-b border-gray-700/50">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-gray-400">phone</span>
+                  <span class="text-gray-400 font-medium">Phone Number</span>
+                </div>
+                <span class="font-bold text-white text-lg">{{ profile()?.phoneNumber }}</span>
               </div>
-              <span class="font-bold text-white">{{ profile()?.phoneNumber }}</span>
-            </div>
 
-            <!-- Role -->
-            <div class="flex items-center justify-between py-4">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-gray-400">admin_panel_settings</span>
-                <span class="text-gray-400 font-medium">Role</span>
-              </div>
-              <span class="inline-flex items-center px-3 py-1 rounded-lg bg-[#1E3A8A] text-[#FFFFFF] font-bold border border-[#1e3a8a]/30">
-                {{ profile()?.role | uppercase }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Verification & Status - 1 column -->
-        <div class="lg:col-span-1">
-          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[#ffc300]">security</span>
-            Account Status
-          </h2>
-          <div class="bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-6 space-y-6">
-            
-            <!-- Identity Status -->
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-sm font-medium">Identity</span>
-                <span class="material-symbols-outlined" [style.color]="profile()?.isVerified ? '#4ade80' : '#fbbf24'">
-                  {{ profile()?.isVerified ? 'verified_user' : 'pending' }}
+              <!-- Role -->
+              <div class="flex items-center justify-between py-4">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-gray-400">workspace_premium</span>
+                  <span class="text-gray-400 font-medium">Role</span>
+                </div>
+                <span class="inline-flex items-center px-4 py-2 rounded-lg bg-[#1E3A8A] text-white font-bold border border-[#1e3a8a]/30">
+                  {{ profile()?.role | uppercase }}
                 </span>
               </div>
-              <p [style.color]="profile()?.isVerified ? '#4ade80' : '#fbbf24'" class="text-lg font-bold">
-                {{ profile()?.isVerified ? 'Verified' : 'Unverified' }}
-              </p>
             </div>
-
-            <div class="h-px bg-gray-700/50"></div>
-
-            <!-- Account Activity -->
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-sm font-medium">Activity</span>
-                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              </div>
-              <p class="text-white text-lg font-bold">{{ profile()?.accountActivity }}</p>
-            </div>
-
-            <div class="h-px bg-gray-700/50"></div>
-
-            <!-- Member Since -->
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-sm font-medium">Member Since</span>
-                <span class="material-symbols-outlined text-gray-400 text-xl">calendar_today</span>
-              </div>
-              <p class="text-white text-lg font-bold">{{ profile()?.memberSince }}</p>
-            </div>
-
-          </div>
-
-          <!-- Verification -->
-          <div class="mt-3">
-            <button 
-              class="w-full bg-[#ffc300] text-[#000814] py-3 rounded-xl font-bold hover:bg-[#ffd700] transition-all hover:scale-105"
-              [disabled]="!canSubmitVerification()"
-              (click)="onRequestVerificationClick()">
-              Start Verification
-            </button>
           </div>
         </div>
 
+        <!-- Right Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+          <!-- Account Status Card -->
+          <div>
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+              <span class="material-symbols-outlined text-[#ffc300] text-3xl">security</span>
+              Account Status
+            </h2>
+            <div class="bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-6 space-y-6">
+              
+              <!-- Identity Status -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-gray-400 text-sm font-medium">Identity</span>
+                  <span class="material-symbols-outlined" 
+                        [style.color]="profile()?.isVerified ? '#4ade80' : '#fbbf24'">
+                    {{ profile()?.isVerified ? 'verified_user' : 'pending' }}
+                  </span>
+                </div>
+                <p [style.color]="profile()?.isVerified ? '#4ade80' : '#fbbf24'" 
+                   class="text-lg font-bold">
+                  {{ profile()?.isVerified ? 'Verified' : 'Unverified' }}
+                </p>
+              </div>
+
+              <div class="h-px bg-gray-700/50"></div>
+
+              <!-- Account Activity -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-gray-400 text-sm font-medium">Activity Status</span>
+                  <span class="w-2 h-2 rounded-full animate-pulse"
+                        [ngClass]="{
+                          'bg-green-400': profile()?.accountActivity === 'ACTIVE',
+                          'bg-gray-400': profile()?.accountActivity === 'INACTIVE',
+                          'bg-yellow-400': profile()?.accountActivity === 'PENDING_REPORT_REVIEW',
+                          'bg-red-400': profile()?.accountActivity === 'SUSPENDED_BY_ADMIN'
+                        }"></span>
+                </div>
+                <p class="text-white text-lg font-bold">
+                  {{ profile()?.accountActivity | spaceify}}
+                </p>
+              </div>
+
+              <div class="h-px bg-gray-700/50"></div>
+
+              <!-- Member Since -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-gray-400 text-sm font-medium">Member Since</span>
+                  <span class="material-symbols-outlined text-gray-400">calendar_today</span>
+                </div>
+                <p class="text-white text-lg font-bold">{{ profile()?.memberSince | date:'MMM d, yyyy' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verification Button -->
+          <button 
+            class="w-full bg-[#ffc300] text-[#000814] py-4 rounded-xl font-bold hover:bg-[#ffd700] transition-all hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+            [disabled]="!canSubmitVerification()"
+            [class.opacity-50]="!canSubmitVerification()"
+            [class.cursor-not-allowed]="!canSubmitVerification()"
+            (click)="onRequestVerificationClick()">
+            <span class="material-symbols-outlined">verified_user</span>
+            {{ profile()?.isVerified ? 'View Verification' : 'Start Verification' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Performance Reviews Section -->
+      <div class="lg:col-span-full">
+        <div class="bg-[#001d3d] border border-[#1e3a8a]/20 rounded-2xl p-8 shadow-lg">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-2xl font-bold mb-2 flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#ffc300] text-3xl">reviews</span>
+                My Performance Reviews
+              </h2>
+              <p class="text-sm text-gray-400">
+                Reviews received from other users • 
+                <span class="font-semibold text-white">{{ profile()?.rating?.toFixed(1) }}</span> average rating
+              </p>
+            </div>
+            <button 
+              class="px-4 py-2 rounded-lg bg-[#1e3a8a] hover:bg-[#2a4fa3] transition-colors flex items-center gap-2"
+              (click)="onRatingRefreshClick()">
+              <span class="material-symbols-outlined text-sm">refresh</span>
+              Refresh
+            </button>
+          </div>
+
+          @if (ratingsLoading()) {
+            <div class="flex items-center justify-center py-12">
+              <div class="text-gray-400">Loading reviews...</div>
+            </div>
+          } @else if (ratings().length === 0) {
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+              <span class="material-symbols-outlined text-7xl text-gray-600 mb-4">rate_review</span>
+              <div class="text-gray-400 text-lg font-semibold">No reviews yet</div>
+              <div class="text-gray-500 text-sm mt-2">Complete transactions to receive reviews from other users</div>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              @for (r of ratings(); track r.id) {
+                <div class="bg-[#00284D] rounded-lg p-6 hover:bg-[#003155] transition-colors border border-gray-700/50">
+                  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-3 mb-3">
+                        <div class="h-10 w-10 rounded-full bg-blue-900 flex items-center justify-center text-sm font-bold text-blue-300">
+                          {{ r.raterUserName.charAt(0).toUpperCase() }}
+                        </div>
+                        <div>
+                          <div class="text-base font-semibold text-[#FFC300]">
+                            {{ r.raterUserName }}
+                          </div>
+                          <div class="text-xs text-gray-400 flex items-center gap-2 mt-1">
+                            <span class="material-symbols-outlined text-xs">calendar_today</span>
+                            {{ r.createdAt | date:'MMM d, yyyy' }}
+                          </div>
+                        </div>
+                      </div>
+                      <p class="text-sm text-gray-300 leading-relaxed mb-2">
+                        {{ r.feedback || 'No written feedback provided' }}
+                      </p>
+                      <div class="text-xs text-gray-500">Review ID: #{{ r.id }}</div>
+                    </div>
+
+                    <div class="flex sm:flex-col items-center sm:items-end gap-2">
+                      <div class="flex gap-0.5">
+                        @for (i of [1,2,3,4,5]; track i) {
+                          <span class="material-symbols-outlined text-xl" 
+                                [class.text-[#FFC300]]="i <= r.rating" 
+                                [class.text-gray-600]="i > r.rating">
+                            star
+                          </span>
+                        }
+                      </div>
+                      <div class="text-lg font-bold text-[#FFC300]">{{ r.rating }}/5</div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-gray-700">
+              <button 
+                (click)="prevRatings()" 
+                [disabled]="ratingsPage() === 1" 
+                class="px-4 py-2 rounded-lg bg-[#1e3a8a] hover:bg-[#2a4fa3] disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">chevron_left</span>
+                Previous
+              </button>
+              <div class="text-sm text-gray-400 text-center">
+                <div class="font-medium text-white mb-1">Page {{ ratingsPage() }} of {{ ratingsTotalPages() }}</div>
+                <div>{{ ratingsTotalItems() }} total reviews</div>
+              </div>
+              <button 
+                (click)="nextRatings()" 
+                [disabled]="ratingsPage() === ratingsTotalPages()" 
+                class="px-4 py-2 rounded-lg bg-[#1e3a8a] hover:bg-[#2a4fa3] disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                Next
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            </div>
+          }
+        </div>
       </div>
 
       <!-- Verification History Section -->
       <div>
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+          <span class="material-symbols-outlined text-[#ffc300] text-3xl">history</span>
+          Verification History
+        </h2>
         <app-verification-summary-table [verifications]="userVerifications()" />
       </div>
 
@@ -255,18 +410,3 @@
 
   }
 </div>
-
-<style>
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-</style>

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { UserSummary } from '../../models/user.summary';
 import { Router } from '@angular/router';
+import { SpaceifyPipe } from '../../../../core/pipes/specify-pipe';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SpaceifyPipe],
   templateUrl: './user-management.html',
 })
 export class UserManagementComponent implements OnInit {
