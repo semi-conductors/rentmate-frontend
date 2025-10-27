@@ -1,0 +1,52 @@
+<div class="category-management-container">
+  <h1>Category Management</h1>
+
+  <div class="form-card">
+    <h2>{{ isEditMode ? 'Edit Category' : 'Add New Category' }}</h2>
+    <form (ngSubmit)="saveCategory()" #categoryForm="ngForm">
+      <div class="form-group">
+        <label for="categoryName">Category Name</label>
+        <input 
+          id="categoryName" 
+          type="text" 
+          name="name" 
+          [(ngModel)]="currentCategory.name" 
+          placeholder="Enter category name" 
+          required 
+          #name="ngModel">
+        
+        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="error-message">
+          Category name is required.
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" [disabled]="loading || categoryForm.invalid" class="save-button">
+          {{ loading ? 'Saving...' : (isEditMode ? 'Update' : 'Add') }}
+        </button>
+        <button *ngIf="isEditMode" type="button" (click)="cancelEdit()" class="cancel-button">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="list-card">
+    <h2>Existing Categories</h2>
+    
+    <div *ngIf="listLoading" class="loading-message">Loading categories...</div>
+    <div *ngIf="listError" class="error-message list-error">{{ listError }}</div>
+
+    <ul *ngIf="!listLoading && categories.length > 0" class="category-list">
+      <li *ngFor="let category of categories" class="category-item">
+        <span class="category-name">{{ category.name }} (ID: {{ category.id }})</span>
+        <div class="item-actions">
+          <button (click)="editCategory(category)" class="edit-button">Edit</button>
+          <button (click)="deleteCategory(category.id)" class="delete-button">Delete</button>
+        </div>
+      </li>
+    </ul>
+
+    <div *ngIf="!listLoading && categories.length === 0" class="no-data">
+        No categories found. Start adding some!
+    </div>
+  </div>
+</div>

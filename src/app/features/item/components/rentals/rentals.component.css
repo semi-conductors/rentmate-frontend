@@ -1,0 +1,133 @@
+.rentals-container {
+  padding: 20px;
+  background-color: #0d1117; 
+  color: #c9d1d9;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: #161b22;
+  border-radius: 8px;
+}
+
+.filters input, .filters select {
+  padding: 10px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  flex-grow: 1;
+  max-width: 200px; /* Adjust max-width for better fit */
+}
+
+.clear-button, .search-button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.search-button {
+  background-color: #ffc107; /* Yellow */
+  color: #161b22;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.item-card {
+  background-color: #161b22;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.item-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.item-info {
+  padding: 15px;
+}
+
+.price {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #7ee787;
+  margin: 5px 0;
+}
+
+.available {
+  color: #238636;
+}
+
+.rented-out {
+  color: #f85149;
+}
+
+.item-actions {
+  display: flex;
+  padding: 0 15px 15px;
+  gap: 10px;
+}
+
+.details-button, .rent-button {
+  flex-grow: 1;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.details-button {
+  background-color: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+}
+
+.rent-button {
+  background-color: #ffc107;
+  color: #161b22;
+}
+
+.rent-button:disabled {
+  background-color: #30363d;
+  color: #8b949e;
+  cursor: not-allowed;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  gap: 15px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  background-color: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Add styles for responsive filters if needed */
+@media (max-width: 768px) {
+  .filters {
+    flex-wrap: wrap;
+  }
+  .filters input, .filters select {
+    max-width: 100%;
+  }
+}

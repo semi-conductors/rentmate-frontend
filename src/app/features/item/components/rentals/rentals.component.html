@@ -1,0 +1,47 @@
+<div class="rentals-container">
+  <h2>Rentals</h2>
+
+  <div class="filters">
+    <input type="text" [(ngModel)]="keyword" placeholder="Search for Items..." class="keyword-input">
+    
+    <input type="number" [(ngModel)]="minPrice" placeholder="Min Price" min="0">
+    <input type="number" [(ngModel)]="maxPrice" placeholder="Max Price" max="1000">
+    
+    <select [(ngModel)]="selectedCategory" class="category-select">
+      <option [ngValue]="null">Select a category</option>
+      <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+    </select>
+
+    <button (click)="clearFilters()" class="clear-button">Clear</button>
+    <button (click)="applyFilters()" class="search-button">Search</button>
+  </div>
+
+  <div *ngIf="loading" class="loading-message">Loading items...</div>
+
+  <div class="item-grid" *ngIf="!loading && items.length > 0">
+    <div *ngFor="let item of items" class="item-card">
+      <img [src]="item.imageUrl" [alt]="item.title" class="item-image">
+      <div class="item-info">
+        <h3>{{ item.title }}</h3>
+        <p class="price">${{ item.rentalPrice }}/day</p>
+        <p class="availability" [ngClass]="item.availability ? 'available' : 'rented-out'">
+          {{ item.availability ? 'Available' : 'Rented Out' }}
+        </p>
+      </div>
+      <div class="item-actions">
+        <button [routerLink]="['/items', item.id]" class="details-button">View Details</button>
+        <button class="rent-button" [disabled]="!item.availability">Rent Now</button>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="!loading && items.length === 0" class="no-results">
+    No items found matching your criteria.
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">&lt; Prev</button>
+    <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages - 1">Next &gt;</button>
+  </div>
+</div>

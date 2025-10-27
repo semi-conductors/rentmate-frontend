@@ -1,0 +1,80 @@
+.update-item-container {
+  padding: 40px;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #58a6ff;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  color: #8b949e;
+  margin-bottom: 30px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background-color: #161b22;
+  padding: 30px;
+  border-radius: 12px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.image-upload-group {
+  grid-column: 1 / 3;
+}
+
+.current-image-preview {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.current-image-preview img {
+  max-height: 150px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+}
+
+.upload-area {
+  /* Same styles as in create-item.component.css */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  border: 2px dashed #58a6ff;
+  border-radius: 6px;
+  background-color: #0d1117;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.note {
+  font-size: 0.8em;
+  color: #8b949e;
+  margin-top: 5px;
+}
+
+.update-button {
+  grid-column: 1 / -1;
+  padding: 15px;
+  margin-top: 30px;
+  background-color: #ffc107;
+  color: #161b22;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Other form element styles same as create-item.component.css */

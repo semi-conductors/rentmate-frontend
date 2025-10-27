@@ -1,0 +1,208 @@
+.my-items-container {
+  padding: 30px;
+  background-color: #0d1117;
+  color: #c9d1d9;
+}
+
+.my-items-container h1 {
+  color: #58a6ff;
+  margin-bottom: 25px;
+}
+
+.add-new-button {
+  background-color: #ffc107;
+  color: #161b22;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 30px;
+  border: none;
+}
+
+.loading-message, .error-message, .no-items {
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.error-message {
+  background-color: #f8514933;
+  color: #f85149;
+}
+
+.no-items {
+    background-color: #161b22;
+    color: #8b949e;
+    font-size: 1.1em;
+}
+
+.go-to-create-button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: #58a6ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.item-card {
+  background-color: #161b22;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.item-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.item-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.price {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #7ee787;
+  margin: 5px 0 10px;
+}
+
+.availability-status.available {
+  color: #238636;
+  font-weight: bold;
+}
+
+.availability-status.rented {
+  color: #f85149;
+  font-weight: bold;
+}
+
+.action-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 15px;
+  gap: 10px;
+}
+
+.update-button, .delete-button {
+  flex-grow: 1;
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.update-button {
+  background-color: #21262d;
+  color: #58a6ff;
+  border: 1px solid #58a6ff;
+}
+
+.delete-button {
+  background-color: #f85149;
+  color: white;
+  border: none;
+}
+
+.update-availability-button {
+  width: calc(100% - 30px);
+  margin: 0 15px 15px 15px;
+  padding: 10px;
+  background-color: #ffc107;
+  color: #161b22;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* --- Modal Styles --- */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #161b22;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 400px;
+}
+
+.availability-options {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 20px 0 30px;
+}
+
+.modal-button {
+  flex-grow: 1;
+  padding: 12px;
+  border: 2px solid #30363d;
+  border-radius: 6px;
+  background-color: #21262d;
+  color: #c9d1d9;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.available-option.active {
+  background-color: #238636;
+  border-color: #238636;
+}
+
+.not-available-option.active {
+  background-color: #f85149;
+  border-color: #f85149;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.cancel-button {
+    background-color: #30363d;
+    color: #c9d1d9;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.save-button {
+  background-color: #ffc107;
+  color: #161b22;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
