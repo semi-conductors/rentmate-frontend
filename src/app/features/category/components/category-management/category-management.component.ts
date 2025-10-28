@@ -1,8 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { CategoryService } from '../../services/category.service';
-import { CategoryDTO } from '../../models/category.model';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CategoryService } from '../../services/category.service';
+import { CategoryDTO } from '../../models/category.model';
+import { EMPTY, catchError, finalize } from 'rxjs';
+
+interface CategoryManagementState {
+  categories: CategoryDTO[];
+  loading: boolean;
+  error: string | null;
+}
 
 @Component({
   selector: 'app-category-management',
@@ -12,107 +19,101 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./category-management.component.css']
 })
 export class CategoryManagementComponent implements OnInit {
-  categories: CategoryDTO[] = [];
   
-  currentCategory: CategoryDTO = { id: 0, name: '' }; 
-  isEditMode: boolean = false;
+  private readonly categoryService = inject(CategoryService);
 
-  loading: boolean = false; 
-  listLoading: boolean = true; 
-  listError: string | null = null;
-  
-  constructor(private categoryService: CategoryService) { }
+  categoryState = signal<CategoryManagementState>({
+    categories: [],
+    loading: false,
+    error: null
+  });
+
+  newCategoryName = signal('');
+  editingCategory = signal<CategoryDTO | null>(null);
 
   ngOnInit(): void {
-    this.fetchCategories();
+    this.loadCategories();
   }
 
-  fetchCategories(): void {
-    this.listLoading = true;
-    this.listError = null;
-    this.categoryService.getAllCategories().subscribe({
-      next: (data) => {
-        this.categories = data;
-        this.listLoading = false;
-      },
-      error: (err) => {
-        this.listError = 'Failed to load categories.';
-        this.listLoading = false;
-        console.error('Error fetching categories:', err);
-      }
+  loadCategories(): void {
+    this.categoryState.update(state => ({ ...state, loading: true, error: null }));
+    
+    this.categoryService.getAllCategories().pipe(
+      catchError(err => {
+        console.error('Failed to load categories', err);
+        this.categoryState.set({ categories: [], loading: false, error: 'Failed to load categories. Please try again.' });
+        return EMPTY;
+      }),
+      finalize(() => this.categoryState.update(state => ({ ...state, loading: false })))
+    ).subscribe(categories => {
+      this.categoryState.update(state => ({ ...state, categories }));
     });
   }
 
-  editCategory(category: CategoryDTO): void {
-    this.currentCategory = { ...category }; 
-    this.isEditMode = true;
-  }
+  addCategory(): void {
+    const name = this.newCategoryName().trim();
+    if (!name) return;
 
+    this.categoryService.createCategory({ name }).pipe(
+      catchError(err => {
+        this.categoryState.update(state => ({ ...state, error: 'Category already exists!' }));
+        return EMPTY;
+      })
+    ).subscribe(newCat => {
+      this.categoryState.update(state => ({ 
+        ...state, 
+        categories: [...state.categories, newCat],
+        error: null 
+      }));
+      this.newCategoryName.set(''); 
+    });
+  }
+  startEdit(category: CategoryDTO): void {
+    this.editingCategory.set({ ...category }); 
+  }
   cancelEdit(): void {
-    this.currentCategory = { id: 0, name: '' };
-    this.isEditMode = false;
+    this.editingCategory.set(null);
   }
 
-  saveCategory(): void {
-    this.loading = true;
-    
-    if (this.isEditMode) {
-      
-      if (!this.currentCategory.id) {
-          alert('Error: Cannot update category without a valid ID.');
-          this.loading = false;
-          return;
-      }
-      
-      this.categoryService.updateCategory(this.currentCategory.id, this.currentCategory).subscribe({
-        next: (updatedCategory) => {
-          alert(`Category "${updatedCategory.name}" updated successfully.`);
-          this.loading = false;
-          this.cancelEdit();
-          this.fetchCategories();
-        },
-        error: (err) => {
-          alert('Failed to update category.');
-          this.loading = false;
-          console.error(err);
-        }
-      });
-    } else {
-      const newCategoryData: Omit<CategoryDTO, 'id'> = { name: this.currentCategory.name };
-      this.categoryService.createCategory(newCategoryData).subscribe({
-        next: (createdCategory) => {
-          alert(`Category "${createdCategory.name}" added successfully.`);
-          this.loading = false;
-          this.cancelEdit();
-          this.fetchCategories();
-        },
-        error: (err) => {
-          alert('Failed to add new category.');
-          this.loading = false;
-          console.error(err);
-        }
-      });
-    }
-  }
+  saveEdit(): void {
+    const categoryToUpdate = this.editingCategory();
+    if (!categoryToUpdate || !categoryToUpdate.id || !categoryToUpdate.name.trim()) return;
 
-  deleteCategory(id: number | undefined): void {
-    
-    if (typeof id !== 'number' || id <= 0) {
-        alert('Error: Invalid category ID for deletion.');
-        return;
-    }
-    
-    if (confirm('Are you sure you want to delete this category? This action is irreversible.')) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          alert('Category deleted successfully.');
-          this.fetchCategories();
-        },
-        error: (err) => {
-          alert('Failed to delete category. It might be in use.');
-          console.error(err);
-        }
-      });
-    }
+    this.categoryService.updateCategory(categoryToUpdate.id, categoryToUpdate).pipe(
+      catchError(err => {
+        this.categoryState.update(state => ({ ...state, error: 'Failed to update category, this name already exists.' }));
+        return EMPTY;
+      })
+    ).subscribe(updatedCat => {
+      this.categoryState.update(state => ({
+        ...state,
+        categories: state.categories.map(cat => 
+          cat.id === updatedCat.id ? updatedCat : cat
+        ),
+        error: null
+      }));
+      this.cancelEdit();
+    });
+  }
+  
+  deleteCategory(id: number): void {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+
+    this.categoryService.deleteCategory(id).pipe(
+      catchError(err => {
+        this.categoryState.update(state => ({ ...state, error: 'Failed to delete category. This category is linked to existing items.' }));
+        return EMPTY;
+      })
+    ).subscribe(() => {
+      this.categoryState.update(state => ({
+        ...state,
+        categories: state.categories.filter(cat => cat.id !== id),
+        error: null
+      }));
+    });
+  }
+  updateEditingName(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.editingCategory.update(cat => cat ? { ...cat, name: input.value } : null);
   }
 }

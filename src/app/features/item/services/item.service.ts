@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ItemResponseDTO, ItemRequestDTO, PageableResponse } from '../models/item.model';
+import { ItemResponseDTO, ItemRequestDTO, Page } from '../models/item.model';
 import { CategoryDTO } from '../../category/models/category.model';
-import { AuthService } from '../../auth/services/auth.service'; // تأكد من المسار الصحيح
+import { AuthService } from '../../auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +43,7 @@ export class ItemService {
     categoryId: number | null,
     page: number = 0,
     size: number = 12
-  ): Observable<PageableResponse<ItemResponseDTO>> {
+  ): Observable<Page<ItemResponseDTO>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -53,7 +53,7 @@ export class ItemService {
     if (maxPrice !== null) params = params.set('maxPrice', maxPrice.toString());
     if (categoryId) params = params.set('categoryId', categoryId.toString());
 
-    return this.http.get<PageableResponse<ItemResponseDTO>>(`${this.apiUrl}/search`, { params });
+    return this.http.get<Page<ItemResponseDTO>>(`${this.apiUrl}/search`, { params });
   }
   
  

@@ -110,6 +110,11 @@ export class MyProfileComponent implements OnInit {
     this.router.navigate(['/verification-request']);
   }
 
+  goToMyItems() {
+  this.router.navigate(['/my-items']);
+}
+
+
   stars() {
     const rating = this.profile()?.rating ?? 0;
     const full = Math.floor(rating);

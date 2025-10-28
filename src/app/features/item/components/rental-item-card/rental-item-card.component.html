@@ -1,0 +1,25 @@
+<div class="item-card">
+  <div class="image-wrapper">
+    <img [src]="item.imageUrl" [alt]="item.title" class="item-image">
+  </div>
+  
+  <div class="item-info">
+    <h3 class="item-title">{{ item.title }}</h3>
+    <p class="item-price">{{ item.rentalPrice | currency:'USD':'symbol':'1.2-2' }} per day</p>
+    
+    <div [ngClass]="item.availability ? 'status-available' : 'status-rented'">
+        {{ item.availability ? 'Available' : 'Rented Out' }}
+    </div>
+
+    <div class="actions">
+      <a [routerLink]="['/items', item.id]" class="btn btn-details">View Details</a>
+      
+      <button 
+        (click)="rentNow()" 
+        [disabled]="!item.availability"
+        class="btn btn-rent">
+        Rent Now
+      </button>
+    </div>
+  </div>
+</div>

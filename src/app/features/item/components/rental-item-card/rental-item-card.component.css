@@ -1,0 +1,183 @@
+.item-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.25s ease;
+  max-width: 300px;
+  margin: 16px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1e293b;
+}
+
+.item-card:hover {
+  transform: translateY(-6px);
+  border-color: #cbd5e1;
+}
+
+/* Image - بدون أي تأثير أو ظل */
+.image-wrapper {
+  height: 180px;
+  background: #f8fafc;
+  overflow: hidden;
+  position: relative;
+}
+
+.item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.item-card:hover .item-image {
+  transform: scale(1.05);
+}
+
+/* Info */
+.item-info {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 8px;
+}
+
+.item-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-price {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #001D3D;
+}
+
+/* Status Badge */
+.status-available,
+.status-rented {
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 6px 0;
+}
+
+.status-available {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.status-rented {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* === زر View Details (أصفر) === */
+.btn-details {
+  background-color: #FFC300;
+  color: #001D3D;
+  font-weight: 700;
+}
+
+.btn-details:hover:not(:disabled) {
+  background-color: #f59e0b;
+  transform: translateY(-1px);
+}
+
+/* === زر Rent Now – نفس لون View Details === */
+.btn-rent {
+  background-color: #FFC300;
+  color: #001D3D;
+  font-weight: 700;
+}
+
+.btn-rent:hover:not(:disabled) {
+  background-color: #f59e0b;
+  transform: translateY(-1px);
+}
+
+.btn-rent:disabled {
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .item-card {
+    max-width: 100%;
+    margin: 12px 8px;
+    border-radius: 14px;
+  }
+
+  .image-wrapper {
+    height: 160px;
+  }
+
+  .item-info {
+    padding: 16px;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .btn {
+    min-height: 42px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .item-title {
+    font-size: 1.05rem;
+  }
+
+  .item-price {
+    font-size: 1.2rem;
+  }
+}

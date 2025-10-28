@@ -20,11 +20,14 @@ export interface ItemRequestDTO {
   ownerAddress: string;
 }
 
-export interface PageableResponse<T> {
-  content: T[];
-  totalPages: number;
-  totalElements: number;
-  number: number; // Current page number (0-indexed)
-  size: number; // Page size
-  
+export interface Page<T> {
+  content: T[];              
+  totalElements: number;    
+  totalPages: number;       
+  size: number;             
+  number: number;           
+  numberOfElements: number;  
+  first: boolean;            
+  last: boolean;             
+  empty: boolean;           
 }

@@ -1,0 +1,52 @@
+<div class="rentals-page-container">
+  <h1>Rentals</h1>
+
+  <app-rental-filters
+    [categories]="categories()"
+    (filterApplied)="handleFilterApplied($event)">
+  </app-rental-filters>
+  
+  <hr>
+
+  <div *ngIf="loading()" class="status-message loading-spinner">
+    Loading rental items...
+  </div>
+  
+  <div *ngIf="error()" class="status-message error-message">
+    {{ error() }}
+  </div>
+
+  <div *ngIf="!loading() && hasItems()" class="items-grid">
+    <app-rental-item-card 
+      *ngFor="let item of itemsPage().content"
+      [item]="item">
+    </app-rental-item-card>
+  </div>
+  
+  <div *ngIf="!loading() && !hasItems()" class="status-message no-results">
+    No items found matching your criteria. Try adjusting the filters.
+  </div>
+
+  <div *ngIf="itemsPage().totalPages > 1" class="pagination">
+  <!-- Previous -->
+  <button class="arrow" 
+          (click)="onPageChange(itemsPage().number - 1)" 
+          [disabled]="itemsPage().number === 0">
+    Previous
+  </button>
+
+  <!-- Page numbers -->
+  <button *ngFor="let page of [].constructor(itemsPage().totalPages); let i = index"
+          [class.current-page]="i === itemsPage().number"
+          (click)="onPageChange(i)">
+    {{ i + 1 }}
+  </button>
+
+  <!-- Next -->
+  <button class="arrow" 
+          (click)="onPageChange(itemsPage().number + 1)" 
+          [disabled]="itemsPage().number === itemsPage().totalPages - 1">
+    Next
+  </button>
+</div>
+</div>

@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ItemService } from '../../services/item.service';
 import { ItemResponseDTO } from '../../models/item.model';
-import { CategoryDTO } from '../../../category/models/category.model';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-item-details',
@@ -12,58 +11,31 @@ import { CommonModule } from '@angular/common';
   templateUrl: './item-details.component.html',
   styleUrls: ['./item-details.component.css']
 })
-export class ItemDetailsComponent implements OnInit {
-  item: ItemResponseDTO | null = null;
-  categoryName: string = 'N/A';
-  loading: boolean = true;
-  error: string | null = null;
+export class ItemDetailsComponent {
+  private route = inject(ActivatedRoute);
+  private itemService = inject(ItemService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private itemService: ItemService
-  ) { }
+  item = signal<ItemResponseDTO | null>(null);
+  loading = signal(true);
+  error = signal<string | null>(null);
 
   ngOnInit(): void {
-    const itemId = this.route.snapshot.paramMap.get('id');
-    if (itemId) {
-      this.fetchItemDetails(+itemId);
-    } else {
-      this.error = 'Item ID is missing.';
-      this.loading = false;
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadItem(+id);
     }
   }
 
-  fetchItemDetails(id: number): void {
-    this.loading = true;
+  private loadItem(id: number): void {
     this.itemService.getItemById(id).subscribe({
       next: (data) => {
-        this.item = data;
-        this.fetchCategoryName(data.categoryId);
-        this.loading = false;
+        this.item.set(data);
+        this.loading.set(false);
       },
-      error: (err) => {
-        this.error = 'Could not load item details.';
-        console.error(err);
-        this.loading = false;
+      error: () => {
+        this.error.set('Failed to load item details.');
+        this.loading.set(false);
       }
     });
-  }
-
-  fetchCategoryName(categoryId: number): void {
-    
-    this.itemService.getAllCategories().subscribe({
-      next: (categories: CategoryDTO[]) => {
-        const category = categories.find(c => c.id === categoryId);
-        this.categoryName = category ? category.name : 'Unknown Category';
-      },
-      error: (err) => {
-        console.error('Error fetching category name:', err);
-        this.categoryName = 'Category Error';
-      }
-    });
-  }
-
-  contactOwner(): void {
-    alert(`Initiating contact for: ${this.item?.title}. (Feature not implemented yet)`);
   }
 }

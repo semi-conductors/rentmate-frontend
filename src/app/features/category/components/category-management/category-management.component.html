@@ -1,52 +1,65 @@
 <div class="category-management-container">
-  <h1>Category Management</h1>
+    <h1>Category Management</h1>
 
-  <div class="form-card">
-    <h2>{{ isEditMode ? 'Edit Category' : 'Add New Category' }}</h2>
-    <form (ngSubmit)="saveCategory()" #categoryForm="ngForm">
-      <div class="form-group">
-        <label for="categoryName">Category Name</label>
-        <input 
-          id="categoryName" 
-          type="text" 
-          name="name" 
-          [(ngModel)]="currentCategory.name" 
-          placeholder="Enter category name" 
-          required 
-          #name="ngModel">
-        
-        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="error-message">
-          Category name is required.
+    <div class="add-category-form card">
+        <h3>Add New Category</h3>
+        <div class="input-group">
+            <input 
+                type="text" 
+                placeholder="Category Name (e.g., Electronics)" 
+                [ngModel]="newCategoryName()"
+                (ngModelChange)="newCategoryName.set($event)"
+                (keyup.enter)="addCategory()"
+                class="form-input"
+            />
+            <button (click)="addCategory()" class="action-button primary-button">Add Category</button>
         </div>
-      </div>
-      
-      <div class="form-actions">
-        <button type="submit" [disabled]="loading || categoryForm.invalid" class="save-button">
-          {{ loading ? 'Saving...' : (isEditMode ? 'Update' : 'Add') }}
-        </button>
-        <button *ngIf="isEditMode" type="button" (click)="cancelEdit()" class="cancel-button">Cancel</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="list-card">
-    <h2>Existing Categories</h2>
-    
-    <div *ngIf="listLoading" class="loading-message">Loading categories...</div>
-    <div *ngIf="listError" class="error-message list-error">{{ listError }}</div>
-
-    <ul *ngIf="!listLoading && categories.length > 0" class="category-list">
-      <li *ngFor="let category of categories" class="category-item">
-        <span class="category-name">{{ category.name }} (ID: {{ category.id }})</span>
-        <div class="item-actions">
-          <button (click)="editCategory(category)" class="edit-button">Edit</button>
-          <button (click)="deleteCategory(category.id)" class="delete-button">Delete</button>
-        </div>
-      </li>
-    </ul>
-
-    <div *ngIf="!listLoading && categories.length === 0" class="no-data">
-        No categories found. Start adding some!
     </div>
-  </div>
+    
+    @if (categoryState().error) {
+        <p class="status-message error-message">{{ categoryState().error }}</p>
+    }
+
+    @if (categoryState().loading) {
+        <p class="status-message loading-message">Loading categories...</p>
+    }
+
+    <div class="category-list-section card">
+        <h3>Current Categories ({{ categoryState().categories.length }})</h3>
+
+        @if (categoryState().categories.length === 0 && !categoryState().loading) {
+            <p class="status-message no-data-message">No categories found.</p>
+        }
+
+        @if (categoryState().categories.length > 0) {
+            <ul class="category-list">
+            
+                @for (category of categoryState().categories; track category.id) {
+                    <li class="category-item">
+                        
+                        @if (editingCategory() && editingCategory()!.id === category.id) {
+                            <div class="edit-mode">
+                                <input 
+                                    type="text" 
+                                    [ngModel]="editingCategory()!.name"
+                                    (input)="updateEditingName($event)"
+                                    class="edit-input"
+                                />
+                                <div class="edit-actions">
+                                    <button (click)="saveEdit()" class="action-button save-button">Save</button>
+                                    <button (click)="cancelEdit()" class="action-button cancel-button">Cancel</button>
+                                </div>
+                            </div>
+                        } @else {
+                            <span class="category-name">{{ category.name }}</span>
+                            <div class="item-actions">
+                                <button (click)="startEdit(category)" class="action-button edit-button">Edit</button>
+                                <button (click)="deleteCategory(category.id!)" class="action-button delete-button">Delete</button>
+                            </div>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </div>
 </div>

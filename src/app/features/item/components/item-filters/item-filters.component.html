@@ -1,0 +1,29 @@
+<div class="filters-container">
+  <input 
+    type="text" 
+    placeholder="Search for items..." 
+    [(ngModel)]="filters().keyword"
+    class="filter-input keyword-input">
+
+  <input 
+    type="number" 
+    placeholder="Min Price" 
+    [(ngModel)]="filters().minPrice"
+    class="filter-input price-input">
+    
+  <input 
+    type="number" 
+    placeholder="Max Price" 
+    [(ngModel)]="filters().maxPrice"
+    class="filter-input price-input">
+
+  <select 
+    [(ngModel)]="filters().categoryId" 
+    class="filter-select category-select">
+    <option [ngValue]="null">Select a category</option>
+    <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+  </select>
+
+  <button (click)="clearFilters()" class="filter-button clear-button">Clear</button>
+  <button (click)="applyFilters()" class="filter-button search-button">Search</button>
+</div>

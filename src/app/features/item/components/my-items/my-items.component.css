@@ -5,12 +5,17 @@
 }
 
 .my-items-container h1 {
-  color: #58a6ff;
-  margin-bottom: 25px;
+  color: #FFC300;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .add-new-button {
-  background-color: #ffc107;
+  background-color: #FFC300;
   color: #161b22;
   padding: 10px 20px;
   border-radius: 6px;
@@ -41,8 +46,8 @@
 .go-to-create-button {
     margin-top: 15px;
     padding: 10px 15px;
-    background-color: #58a6ff;
-    color: white;
+    background-color: #FFC300;
+    color: #161b22;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -78,7 +83,7 @@
 .price {
   font-size: 1.1em;
   font-weight: bold;
-  color: #7ee787;
+  color: #FFC300;
   margin: 5px 0 10px;
 }
 
@@ -109,21 +114,21 @@
 
 .update-button {
   background-color: #21262d;
-  color: #58a6ff;
-  border: 1px solid #58a6ff;
+  color: #FFC300;
+  border: 1px solid #FFC300;
 }
 
 .delete-button {
-  background-color: #f85149;
-  color: white;
-  border: none;
+  background-color: #21262d;
+  color: #FFC300;
+  border: 1px solid #FFC300;
 }
 
 .update-availability-button {
   width: calc(100% - 30px);
   margin: 0 15px 15px 15px;
   padding: 10px;
-  background-color: #ffc107;
+  background-color: #FFC300;
   color: #161b22;
   border: none;
   border-radius: 4px;
@@ -198,7 +203,7 @@
 }
 
 .save-button {
-  background-color: #ffc107;
+  background-color: #FFC300;
   color: #161b22;
   border: none;
   padding: 10px 20px;

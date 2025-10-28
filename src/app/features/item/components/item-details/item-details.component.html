@@ -1,0 +1,46 @@
+<div class="details-container">
+  @if (loading()) {
+    <p class="loading">Loading item details...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (item()) {
+    <h1>Item Details</h1>
+
+    <div class="details-grid">
+      <div class="image-wrapper">
+        <img [src]="item()!.imageUrl" alt="{{ item()!.title }}" />
+      </div>
+
+      <div class="info-content">
+        <div class="header">
+          <h2>{{ item()!.title }}</h2>
+          <span class="status" [class.available]="item()!.availability">
+            {{ item()!.availability ? 'Available' : 'Rented Out' }}
+          </span>
+        </div>
+
+        <p class="price">${{ item()!.rentalPrice }} per day</p>
+
+        <p class="description">{{ item()!.description }}</p>
+
+        <hr />
+
+        <div class="meta">
+          <div class="meta-item">
+            <strong>Category</strong>
+            <span>Electronics</span>
+          </div>
+          <div class="meta-item">
+            <strong>Owner Address</strong>
+            <span>{{ item()!.ownerAddress }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+</div>

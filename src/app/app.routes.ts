@@ -31,15 +31,13 @@ export const routes: Routes = [
   
 // Item Service Routes
   { 
-    path: 'rentals', 
-    loadComponent: () => import('./features/item/components/rentals/rentals.component').then(m => m.RentalsComponent) 
+    path: 'items', 
+    loadComponent: () => import('./features/item/components/items/items.component').then(m => m.RentalsComponent) 
   },
-
   { 
     path: 'items/:id', 
     loadComponent: () => import('./features/item/components/item-details/item-details.component').then(m => m.ItemDetailsComponent) 
   },
-  
   { 
     path: 'my-items', 
     loadComponent: () => import('./features/item/components/my-items/my-items.component').then(m => m.MyItemsComponent) 
@@ -52,7 +50,6 @@ export const routes: Routes = [
     path: 'update-item/:id', 
     loadComponent: () => import('./features/item/components/update-item/update-item.component').then(m => m.UpdateItemComponent) 
   },
-
   {
     path: 'admin/categories',
     loadComponent: () => import('./features/category/components/category-management/category-management.component').then(m => m.CategoryManagementComponent),

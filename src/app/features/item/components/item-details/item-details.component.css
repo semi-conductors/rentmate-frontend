@@ -1,89 +1,225 @@
+/* تنسيقات القاعدة للصفحة والحاوية الرئيسية */
+:host {
+    display: block;
+    background-color: #001D3D; /* خلفية داكنة جداً */
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .details-container {
-  padding: 40px;
-  background-color: #0d1117;
-  color: #c9d1d9;
+    max-width: 1000px; 
+    margin: 40px auto; 
+    background-color: #000814; 
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); 
+    padding: 30px;
+    color: #e0e0e0; 
 }
 
-.item-details-card {
-  max-width: 1000px;
-  margin: 0 auto;
-  background-color: #161b22;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+/* عنوان الصفحة الرئيسي */
+h1 {
+    color: #FFC300; 
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: left;
+    border-bottom: 1px solid #2f4560; 
+    padding-bottom: 15px;
 }
 
-.content-wrapper {
-  display: flex;
-  gap: 30px;
+/* رسائل التحميل والخطأ */
+.loading, .error {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 
-.image-section {
-  flex: 1;
+.loading {
+    background-color: #2a3c58;
+    color: #a7d9ff;
 }
 
-.item-main-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
+.error {
+    background-color: #c0392b; 
+    color: #ffe0e0;
 }
 
-.info-section {
-  flex: 1;
+
+/* 🚨 الحل: استخدام Flexbox لضمان عدم خروج المحتوى */
+.details-grid {
+    display: flex;
+    gap: 30px; 
+    align-items: flex-start; /* محاذاة للأعلى */
 }
 
-.info-section h2 {
-  margin-top: 0;
-  font-size: 2em;
+/* قسم الصورة */
+.image-wrapper {
+    /* 🚨 تحديد عرض ثابت للصورة */
+    flex-basis: 400px; 
+    flex-shrink: 0; /* منع الصورة من الانكماش */
+    height: 300px; 
+    overflow: hidden; 
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.availability-tag {
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-weight: bold;
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    display: block;
 }
 
-.available {
-  background-color: #238636;
+/* قسم المعلومات */
+.info-content {
+    flex-grow: 1; /* السماح للمعلومات بأخذ المساحة المتبقية */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    /* 🚨 إضافة عرض أقصى لضمان عدم خروج النصوص الطويلة */
+    min-width: 0; 
 }
 
-.unavailable {
-  background-color: #f85149;
+/* رأس قسم المعلومات (العنوان والحالة) */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    margin-bottom: 5px;
 }
 
+.header h2 {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    /* 🚨 حل مشكلة النصوص الطويلة */
+    word-break: break-word; 
+    max-width: 70%; /* إعطاء مساحة للحالة */
+}
+
+/* شارة الحالة */
+.status {
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #121212;
+    text-transform: uppercase;
+    background-color: #FFC300; /* اللون الافتراضي للتأجير */
+}
+
+.status.available {
+    background-color: #238636; /* أخضر للمتاح */
+    color: white;
+}
+
+/* السعر */
 .price {
-  font-size: 1.8em;
-  font-weight: bold;
-  color: #7ee787;
-  margin: 15px 0 20px 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffc107; 
+    margin: 0 0 15px 0;
 }
 
+/* الوصف */
 .description {
-  line-height: 1.6;
+    line-height: 1.6;
+    color: #b0b0b0;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    /* 🚨 حل مشكلة النصوص الطويلة */
+    word-break: break-word; 
 }
 
-.meta-data {
-  margin: 20px 0;
+/* الخط الفاصل */
+hr {
+    border: none;
+    border-top: 1px solid #2f4560;
+    margin: 20px 0;
+}
+
+/* البيانات الوصفية (الفئة وعنوان المالك) */
+.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
 }
 
 .meta-item {
-  padding: 5px 0;
-  border-bottom: 1px dashed #30363d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #2f4560; /* خط صلب للفصل */
 }
 
-.contact-button {
-  padding: 12px 25px;
-  background-color: #ffc107;
-  color: #161b22;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
+.meta-item:last-child {
+    border-bottom: none;
 }
 
+.meta-item strong {
+    color: #a0a0a0; /* لون خفيف للتسمية */
+    font-weight: 500;
+    flex-basis: 30%; /* تحديد عرض التسمية */
+    flex-shrink: 0;
+}
+
+.meta-item span {
+    color: #ffffff; /* لون أبيض للقيمة */
+    font-weight: 600;
+    text-align: right;
+    flex-grow: 1;
+    /* 🚨 حل مشكلة النصوص الطويلة */
+    word-break: break-word; 
+}
+
+/* --- استجابة الشاشات (Mobile Responsiveness) --- */
 @media (max-width: 768px) {
-  .content-wrapper {
-    flex-direction: column;
-  }
+    .details-grid {
+        flex-direction: column; /* تحويل العرض إلى عمود واحد */
+        gap: 20px;
+    }
+
+    .image-wrapper {
+        flex-basis: auto;
+        width: 100%;
+        height: 250px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .header {
+        flex-direction: column; 
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .header h2 {
+        font-size: 1.7rem;
+        max-width: 100%;
+    }
+
+    .meta-item {
+        flex-direction: column; /* التسمية والقيمة في سطرين */
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .meta-item strong {
+        flex-basis: auto;
+        width: 100%;
+    }
+
+    .meta-item span {
+        text-align: left;
+        width: 100%;
+    }
 }

@@ -37,6 +37,7 @@ export class SidebarComponent implements OnInit {
       },
       { label: 'Verification Queue', icon: 'verified_user', route: '/verification-queue' },
       { label: 'Reports Dashboard', icon: 'bar_chart', route: 'admin/reports' },
+      { label: 'Manage Categories', icon: 'category', route: 'admin/categories' },
     ]);
   }
 
