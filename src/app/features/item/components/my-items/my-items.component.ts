@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { ItemService } from '../../services/item.service';
 import { ItemResponseDTO } from '../../models/item.model';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-my-items',
@@ -12,87 +13,90 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./my-items.component.css']
 })
 export class MyItemsComponent implements OnInit {
-  items: ItemResponseDTO[] = [];
-  loading: boolean = true;
-  error: string | null = null;
-  
+  private readonly itemService = inject(ItemService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  // Signals for state
+  readonly items = signal<ItemResponseDTO[]>([]);
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
+
   // Modal state
-  isModalOpen: boolean = false;
-  selectedItem: ItemResponseDTO | null = null;
-  newAvailabilityStatus: boolean = true; 
+  readonly isModalOpen = signal(false);
+  readonly selectedItem = signal<ItemResponseDTO | null>(null);
+  readonly newAvailabilityStatus = signal<boolean>(true);
 
- 
-
-  constructor(private itemService: ItemService) { }
+  // Derived/computed signals
+  readonly hasItems = computed(() => this.items().length > 0);
 
   ngOnInit(): void {
     this.fetchOwnerItems();
   }
 
   fetchOwnerItems(): void {
-    this.loading = true;
-    
-    this.itemService.getItemsByOwner().subscribe({ 
+    const user = this.authService.currentUser();
+    if (!user || !user.id) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.loading.set(true);
+    this.itemService.getItemsByOwner(user.id).subscribe({
       next: (data) => {
-        this.items = data;
-        this.loading = false;
-        this.error = null; 
+        this.items.set(data);
+        this.error.set(null);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('Failed to load user items:', err);
-        
-        this.error = 'Failed to load your items. Please ensure you are logged in.';
-        this.loading = false;
-        this.items = []; 
+        this.error.set('Failed to load your items. Please ensure you are logged in.');
+        this.items.set([]);
+        this.loading.set(false);
       }
     });
   }
 
   deleteItem(itemId: number): void {
-    if (confirm('Are you sure you want to delete this item?')) {
-      
-      this.itemService.deleteItem(itemId).subscribe({
-        next: () => {
-          alert('Item deleted successfully (soft delete).');
-          this.fetchOwnerItems(); 
-        },
-        error: (err) => {
-          alert('Failed to delete item. You may not be the owner.');
-          console.error(err);
-        }
-      });
-    }
+    if (!confirm('Are you sure you want to delete this item?')) return;
+
+    this.itemService.deleteItem(itemId).subscribe({
+      next: () => {
+        alert('Item deleted successfully (soft delete).');
+        this.fetchOwnerItems();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to delete item. You may not be the owner.');
+      }
+    });
   }
 
-  // --- Update Availability Modal Methods ---
-
+  // --- Update Availability Modal ---
   openUpdateAvailabilityModal(item: ItemResponseDTO): void {
-    this.selectedItem = item;
-    this.newAvailabilityStatus = item.availability;
-    this.isModalOpen = true;
+    this.selectedItem.set(item);
+    this.newAvailabilityStatus.set(item.availability);
+    this.isModalOpen.set(true);
   }
 
   closeUpdateAvailabilityModal(): void {
-    this.isModalOpen = false;
-    this.selectedItem = null;
+    this.isModalOpen.set(false);
+    this.selectedItem.set(null);
   }
 
   saveAvailability(): void {
-    if (!this.selectedItem) return;
+    const item = this.selectedItem();
+    if (!item) return;
 
-    
-    this.itemService.updateItemAvailability(
-      this.selectedItem.id, 
-      this.newAvailabilityStatus
-    ).subscribe({
+    this.itemService.updateItemAvailability(item.id, this.newAvailabilityStatus()).subscribe({
       next: (updatedItem) => {
         alert(`${updatedItem.title} availability updated.`);
         this.closeUpdateAvailabilityModal();
-        this.fetchOwnerItems(); 
+        this.fetchOwnerItems();
       },
       error: (err) => {
-        alert('Failed to update availability. You may not be the owner.');
         console.error(err);
+        alert('Failed to update availability. You may not be the owner.');
         this.closeUpdateAvailabilityModal();
       }
     });

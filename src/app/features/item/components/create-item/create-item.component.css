@@ -61,7 +61,7 @@ input[type="text"], input[type="number"], textarea, select {
 }
 
 .error-message, .server-error-message {
-  color: #f85149;
+  color: #f85149; 
   font-size: 0.9em;
   margin-top: 5px;
 }

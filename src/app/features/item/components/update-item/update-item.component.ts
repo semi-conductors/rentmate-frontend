@@ -1,18 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ItemService } from '../../services/item.service';
-import { ItemRequestDTO } from '../../models/item.model';
-import { CategoryDTO } from '../../../category/models/category.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../auth/services/auth.service'; 
-
+import { ActivatedRoute, Router } from '@angular/router';
+import { ItemService } from '../../services/item.service';
+import { AuthService } from '../../../auth/services/auth.service';
+import { ItemRequestDTO } from '../../models/item.model';
+import { CategoryDTO } from '../../../category/models/category.model';
 
 interface UpdateFormDTO extends Omit<ItemRequestDTO, 'price' | 'categoryId' | 'imageUrl'> {
   price: number;
   categoryId: number;
   imageUrl?: string;
-  availability: boolean; 
+  availability: boolean;
 }
 
 @Component({
@@ -23,139 +22,168 @@ interface UpdateFormDTO extends Omit<ItemRequestDTO, 'price' | 'categoryId' | 'i
   styleUrls: ['./update-item.component.css']
 })
 export class UpdateItemComponent implements OnInit {
-  itemId: number | null = null;
-  itemData: UpdateFormDTO | null = null;
-  categories: CategoryDTO[] = [];
-  
-  selectedImageFile: File | null = null;
-  selectedFileName: string = '';
+  // Inject services
+  private readonly route = inject(ActivatedRoute);
+  private readonly itemService = inject(ItemService);
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
-  loading: boolean = true;
-  errorMessage: string | null = null;
-  error: string | null = null;
-  
-  
+  // Reactive state
+  readonly itemId = signal<number | null>(null);
+  readonly itemData = signal<UpdateFormDTO | null>(null);
+  readonly categories = signal<CategoryDTO[]>([]);
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
+  readonly errorMessage = signal<string | null>(null);
 
-  constructor(
-    private route: ActivatedRoute,
-    private itemService: ItemService,
-    private router: Router,
-    private authService: AuthService 
-  ) { }
+  readonly selectedImageFile = signal<File | null>(null);
+  readonly selectedFileName = computed(() => this.selectedImageFile()?.name ?? '');
+
+  readonly canEdit = computed(() => {
+    const userId = this.authService.currentUser()?.id;
+    const item = this.itemData();
+    return userId && item && item.ownerId === userId;
+  });
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.itemId = +id;
-      this.fetchCategories();
-      this.fetchItemDetails(this.itemId);
-    } else {
-      this.error = 'Item ID is missing.';
-      this.loading = false;
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) {
+      this.error.set('Item ID is missing.');
+      this.loading.set(false);
+      return;
     }
+
+    const id = +idParam;
+    this.itemId.set(id);
+    this.fetchCategories();
+    this.fetchItemDetails(id);
   }
 
-  fetchCategories(): void {
-    
+  private fetchCategories(): void {
     this.itemService.getAllCategories().subscribe({
-      next: (data) => this.categories = data,
+      next: (data) => this.categories.set(data),
       error: (err) => console.error('Error fetching categories:', err)
     });
   }
 
-  fetchItemDetails(id: number): void {
-    this.loading = true;
+  private fetchItemDetails(id: number): void {
+    this.loading.set(true);
     this.itemService.getItemById(id).subscribe({
       next: (data) => {
-        // Map ItemResponseDTO to UpdateFormDTO
-        this.itemData = {
+        const mapped: UpdateFormDTO = {
           ownerId: data.ownerId,
           title: data.title,
           description: data.description,
-          price: data.rentalPrice, 
+          price: data.rentalPrice,
           categoryId: data.categoryId,
           imageUrl: data.imageUrl,
           ownerAddress: data.ownerAddress,
           availability: data.availability
         };
-        this.loading = false;
-        
-     
-        const currentUserId = this.authService.currentUser()?.id;
-        
-        if (!currentUserId || this.itemData.ownerId !== currentUserId) {
-            this.error = 'You do not have permission to edit this item, or you are not logged in.';
-            this.itemData = null;
+        this.itemData.set(mapped);
+        this.loading.set(false);
+
+        if (!this.canEdit()) {
+          this.error.set('You do not have permission to edit this item, or you are not logged in.');
+          this.itemData.set(null);
         }
       },
       error: (err) => {
-        this.error = 'Could not load item details for update.';
         console.error(err);
-        this.loading = false;
+        this.error.set('Could not load item details for update.');
+        this.loading.set(false);
       }
     });
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length) {
-      this.selectedImageFile = input.files[0];
-      this.selectedFileName = this.selectedImageFile.name;
+    if (input.files?.length) {
+      this.selectedImageFile.set(input.files[0]);
     } else {
-      this.selectedImageFile = null;
-      this.selectedFileName = '';
+      this.selectedImageFile.set(null);
     }
   }
-  
+
   onSubmit(): void {
-    if (!this.itemData || !this.itemId) return;
-    this.errorMessage = null;
-    this.loading = true;
+    const item = this.itemData();
+    const id = this.itemId();
+    if (!item || !id) return;
 
-    const initialAvailability = this.itemData.availability;
+    this.errorMessage.set(null);
+    this.loading.set(true);
 
-    const requestDTO: ItemRequestDTO = {
-        ownerId: this.itemData.ownerId,
-        title: this.itemData.title,
-        description: this.itemData.description,
-        price: this.itemData.price,
-        categoryId: this.itemData.categoryId,
-        ownerAddress: this.itemData.ownerAddress,
-        imageUrl: this.itemData.imageUrl // Sending the current/new URL string
-    };
+    const initialAvailability = item.availability;
+    const hasNewImage = !!this.selectedImageFile();
 
-    this.itemService.updateItem(this.itemId, requestDTO).subscribe({
-      next: (response) => {
-        alert('Item details updated successfully!');
-        this.loading = false;
+    // --- CASE 1: Image changed → send multipart/form-data ---
+    if (hasNewImage) {
+      const formData = new FormData();
+      formData.append('imageFile', this.selectedImageFile()!);
+      formData.append('itemData', new Blob([JSON.stringify({
+        ownerId: item.ownerId,
+        title: item.title.trim(),
+        description: item.description.trim(),
+        price: +item.price,
+        categoryId: item.categoryId,
+        ownerAddress: item.ownerAddress.trim(),
+        imageUrl: item.imageUrl // may be ignored by backend
+      })], { type: 'application/json' }));
 
-        // Check if availability was changed and call the PATCH API
-        if (this.itemData!.availability !== initialAvailability) {
-            this.updateAvailabilityInSeparateCall(this.itemId!, this.itemData!.availability);
-        } else {
-             this.router.navigate(['/my-items']);
+      this.itemService.updateItemWithImage(id, formData).subscribe({
+        next: () => {
+          this.afterSuccessfulUpdate(id, initialAvailability);
+        },
+        error: (err) => {
+          console.error(err);
+          this.errorMessage.set('Update failed while uploading new image.');
+          this.loading.set(false);
         }
-      },
-      error: (err) => {
-        this.errorMessage = 'Update failed. Please check the form and try again.';
-        console.error(err);
-        this.loading = false;
-      }
-    });
-  }
-  
-  private updateAvailabilityInSeparateCall(itemId: number, newAvailability: boolean): void {
-      
-      this.itemService.updateItemAvailability(itemId, newAvailability).subscribe({ 
-          next: () => {
-              alert('Availability also updated successfully.');
-              this.router.navigate(['/my-items']);
-          },
-          error: (err) => {
-              this.errorMessage = 'Item details updated, but failed to update availability.';
-              console.error(err);
-              this.router.navigate(['/my-items']); 
-          }
       });
+    }
+    // --- CASE 2: Image unchanged → normal PUT ---
+    else {
+      const requestDTO: ItemRequestDTO = {
+        ownerId: item.ownerId,
+        title: item.title.trim(),
+        description: item.description.trim(),
+        price: +item.price,
+        categoryId: item.categoryId,
+        ownerAddress: item.ownerAddress.trim(),
+        imageUrl: item.imageUrl
+      };
+
+      this.itemService.updateItem(id, requestDTO).subscribe({
+        next: () => this.afterSuccessfulUpdate(id, initialAvailability),
+        error: (err) => {
+          console.error(err);
+          this.errorMessage.set('Update failed. Please check the form and try again.');
+          this.loading.set(false);
+        }
+      });
+    }
+  }
+
+  private afterSuccessfulUpdate(id: number, initialAvailability: boolean): void {
+    const item = this.itemData();
+    if (!item) return;
+
+    const availabilityChanged = item.availability !== initialAvailability;
+    if (availabilityChanged) {
+      this.itemService.updateItemAvailability(id, item.availability).subscribe({
+        next: () => {
+          alert('Item and availability updated successfully!');
+          this.router.navigate(['/my-items']);
+        },
+        error: (err) => {
+          console.error(err);
+          this.errorMessage.set('Item updated, but failed to update availability.');
+          this.router.navigate(['/my-items']);
+        }
+      });
+    } else {
+      alert('Item updated successfully!');
+      this.router.navigate(['/my-items']);
+    }
   }
 }

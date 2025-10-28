@@ -3,64 +3,74 @@
   
   <button [routerLink]="['/create-item']" class="add-new-button">+ Add New Item</button>
 
-  <div *ngIf="loading" class="loading-message">Loading your items...</div>
-  
-  <div *ngIf="error" class="error-message">{{ error }}</div>
+  @if (loading()) {
+    <div class="loading-message">Loading your items...</div>
+  }
+  @else if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+  @else if (hasItems()) {
+    <div class="item-grid">
+      @for (item of items(); track item.id) {
+        <div class="item-card">
+          <img [src]="item.imageUrl" [alt]="item.title" class="item-image">
 
-  <div class="item-grid" *ngIf="!loading && items.length > 0">
-    <div *ngFor="let item of items" class="item-card">
-      
-      <img [src]="item.imageUrl" [alt]="item.title" class="item-image">
-      
-      <div class="item-info">
-        <h3>{{ item.title }}</h3>
-        <p class="price">${{ item.rentalPrice }}</p>
-        <p class="availability-status" [ngClass]="item.availability ? 'available' : 'rented'">
-          {{ item.availability ? 'Available' : 'Rented Out' }}
-        </p>
-      </div>
-      
-      <div class="action-row">
-        <button [routerLink]="['/update-item', item.id]" class="update-button">Update</button>
-        <button (click)="deleteItem(item.id)" class="delete-button">Delete</button>
-      </div>
+          <div class="item-info">
+            <h3>{{ item.title }}</h3>
+            <p class="price">${{ item.rentalPrice }}</p>
+            <p class="availability-status" [ngClass]="item.availability ? 'available' : 'rented'">
+              {{ item.availability ? 'Available' : 'Rented Out' }}
+            </p>
+          </div>
 
-      <button (click)="openUpdateAvailabilityModal(item)" class="update-availability-button">
-        Update Availability
+          <div class="action-row">
+            <button [routerLink]="['/update-item', item.id]" class="update-button">Update</button>
+            <button (click)="deleteItem(item.id)" class="delete-button">Delete</button>
+          </div>
+
+          <button (click)="openUpdateAvailabilityModal(item)" class="update-availability-button">
+            Update Availability
+          </button>
+        </div>
+      }
+    </div>
+  }
+  @else {
+    <div class="no-items">
+      You haven't listed any items yet.
+      <br>
+      <button [routerLink]="['/create-item']" class="go-to-create-button">
+        List Your First Item
       </button>
     </div>
-  </div>
+  }
 
-  <div *ngIf="!loading && items.length === 0 && !error" class="no-items">
-    You haven't listed any items yet.
-    <br>
-    <button [routerLink]="['/create-item']" class="go-to-create-button">List Your First Item</button>
-  </div>
+  @if (isModalOpen()) {
+    <div class="modal-backdrop">
+      <div class="modal-content">
+        <h2>Update Availability</h2>
+        <p>Item: <strong>{{ selectedItem()?.title }}</strong></p>
 
-  <div class="modal-backdrop" *ngIf="isModalOpen">
-    <div class="modal-content">
-      <h2>Update Availability</h2>
-      <p>Item: <strong>{{ selectedItem?.title }}</strong></p>
-      
-      <div class="availability-options">
-        <button 
-          [ngClass]="{'active': newAvailabilityStatus === true}" 
-          (click)="newAvailabilityStatus = true"
-          class="modal-button available-option">
-          Available
-        </button>
-        <button 
-          [ngClass]="{'active': newAvailabilityStatus === false}" 
-          (click)="newAvailabilityStatus = false"
-          class="modal-button not-available-option">
-          Not Available
-        </button>
-      </div>
+        <div class="availability-options">
+          <button 
+            [ngClass]="{ 'active': newAvailabilityStatus() === true }" 
+            (click)="newAvailabilityStatus.set(true)"
+            class="modal-button available-option">
+            Available
+          </button>
+          <button 
+            [ngClass]="{ 'active': newAvailabilityStatus() === false }" 
+            (click)="newAvailabilityStatus.set(false)"
+            class="modal-button not-available-option">
+            Not Available
+          </button>
+        </div>
 
-      <div class="modal-actions">
-        <button (click)="closeUpdateAvailabilityModal()" class="cancel-button">Cancel</button>
-        <button (click)="saveAvailability()" class="save-button">Save Availability</button>
+        <div class="modal-actions">
+          <button (click)="closeUpdateAvailabilityModal()" class="cancel-button">Cancel</button>
+          <button (click)="saveAvailability()" class="save-button">Save Availability</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 </div>

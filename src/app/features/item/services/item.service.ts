@@ -62,12 +62,7 @@ export class ItemService {
   }
 
   
-  getItemsByOwner(): Observable<ItemResponseDTO[]> {
-    const user = this.authService.currentUser();
-    if (!user || !user.id) {
-      return throwError(() => new Error('User not logged in or missing ID.'));
-    }
-    const ownerId = user.id; 
+  getItemsByOwner(ownerId: number): Observable<ItemResponseDTO[]> {
     return this.http.get<ItemResponseDTO[]>(`${this.apiUrl}/owner/${ownerId}`);
   }
 
@@ -111,10 +106,20 @@ export class ItemService {
     if (!user || !user.id) {
       return throwError(() => new Error('User not logged in or missing ID.'));
     }
+
     let params = new HttpParams()
       .set('ownerId', user.id.toString())
       .set('availability', availability.toString());
     
     return this.http.patch<ItemResponseDTO>(`${this.apiUrl}/${id}/availability`, null, { params });
+  }
+
+  updateItemWithImage(id: number, formData: FormData) {
+    const user = this.authService.currentUser();
+    if (!user || !user.id) {
+      return throwError(() => new Error('User not logged in or missing ID.'));
+    }
+
+    return this.http.put<ItemResponseDTO>(`${this.apiUrl}/${id}/with-image`,formData);
   }
 }
