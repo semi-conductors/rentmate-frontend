@@ -10,8 +10,8 @@ import { AuthService } from '../../auth/services/auth.service';
   providedIn: 'root'
 })
 export class ItemService {
-  private apiUrl = 'http://localhost:8081/items';
-  private categoryUrl = 'http://localhost:8081/categories';
+  private apiUrl = 'http://localhost:8585/items';
+  private categoryUrl = 'http://localhost:8585/categories';
   
   
   constructor(

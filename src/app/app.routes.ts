@@ -6,10 +6,16 @@ import { ResetPasswordComponent } from './features/auth/components/reset-passwor
 import { MyProfileComponent } from './features/user-management/components/my-profile/my-profile';
 import { PublicUserProfileComponent } from './features/user-management/components/public-user-profile/public-user-profile';
 import { UserManagementComponent } from './features/user-management/components/user-management/user-management';
+import { BookingForm } from './features/rentals/components/booking-form/booking-form';
+import { BrowseRentals } from './features/rentals/components/browse-rentals/browse-rentals';
+import { RentalDetails } from './features/rentals/components/rental-details/rental-details';
 
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: 'booking/:itemId', component: BookingForm },
+  { path: 'browse-rentals', component: BrowseRentals },
+  { path: 'rental-details/:id', component: RentalDetails },
   { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent) },
   { path: 'browse', loadComponent: () => import('./pages/browse/browse').then(m => m.BrowseComponent) },
   { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) },

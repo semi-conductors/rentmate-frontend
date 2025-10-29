@@ -1,0 +1,150 @@
+<!-- rental-details.component.html -->
+<div class="container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner">⏳</div>
+    <p>Loading rental details...</p>
+  </div>
+
+  <!-- Rental Details Content -->
+  <div *ngIf="!isLoading && rental" class="content">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-btn" (click)="goBack()">
+        ← Back to My Rentals
+      </button>
+      <div class="logo">Rent<span>Mate</span></div>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="status-banner" [style.background-color]="getStatusColor(rental.status) + '20'" 
+         [style.border-color]="getStatusColor(rental.status)">
+      <div class="status-icon">{{ getStatusIcon(rental.status) }}</div>
+      <div class="status-info">
+        <h2>Rental Request {{ rental.status }}</h2>
+        <p>Request ID: #{{ rental.rentalId }}</p>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="details-grid">
+      <!-- Left Column -->
+      <div class="left-column">
+        <!-- Item Details Card -->
+        <div class="card">
+          <h3>📦 Item Details</h3>
+          <div class="item-preview">
+            <div class="item-icon">{{ itemDetails?.icon || '📦' }}</div>
+            <div class="item-info">
+              <h4>{{ itemDetails?.title || 'Loading...' }}</h4>
+              <p>Item ID: #{{ rental.itemId }}</p>
+              <p class="daily-rate">${{ itemDetails?.rentalPrice || 0 }}/day</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rental Period Card -->
+        <div class="card">
+          <h3>📅 Rental Period</h3>
+          <div class="detail-row">
+            <span class="label">Start Date</span>
+            <span class="value">{{ formatDate(rental.startDate) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">End Date</span>
+            <span class="value">{{ formatDate(rental.endDate) }}</span>
+          </div>
+          <div class="detail-row highlight">
+            <span class="label">Duration</span>
+            <span class="value">{{ rentalDays }} Days</span>
+          </div>
+        </div>
+
+        <!-- Timeline Card -->
+        <div class="card">
+          <h3>📍 Request Timeline</h3>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot active"></div>
+              <div class="timeline-content">
+                <p class="timeline-title">Request Created</p>
+                <p class="timeline-date">{{ formatDate(rental.createdDate) }}</p>
+              </div>
+            </div>
+            <div class="timeline-item" [class.active]="rental.status !== 'Pending'">
+              <div class="timeline-dot" [class.active]="rental.status !== 'Pending'"></div>
+              <div class="timeline-content">
+                <p class="timeline-title">Owner Response</p>
+                <p class="timeline-date" *ngIf="rental.lastModifiedDate && rental.status !== 'Pending'">
+                  {{ formatDate(rental.lastModifiedDate) }}
+                </p>
+                <p class="timeline-date" *ngIf="rental.status === 'Pending'">Pending...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+        <!-- Price Summary Card -->
+        <div class="card summary-card">
+          <h3>💰 Price Summary</h3>
+          
+          <div class="duration-badge">
+            <div class="days">{{ rentalDays }}</div>
+            <div class="label">Days</div>
+          </div>
+
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span>Daily Rate</span>
+              <span class="amount">${{ (rental.rentalPrice / rentalDays).toFixed(2) }}</span>
+            </div>
+            <div class="price-row">
+              <span>Rental Duration</span>
+              <span>{{ rentalDays }} days</span>
+            </div>
+            <div class="price-row highlight-row">
+              <span>Subtotal</span>
+              <span class="amount">${{ rental.rentalPrice.toFixed(2) }}</span>
+            </div>
+            <div class="price-row">
+              <span>Deposit (15%)</span>
+              <span class="amount">${{ rental.depositAmount.toFixed(2) }}</span>
+            </div>
+            <div class="price-row total">
+              <span>Total Amount</span>
+              <span class="amount">${{ rental.totalPrice.toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <span class="info-icon">ℹ️</span>
+            <p>The deposit will be refunded after you return the item in good condition.</p>
+          </div>
+        </div>
+
+        <!-- Status Info Card -->
+        <div class="card status-info-card">
+          <h3>📋 What's Next?</h3>
+          
+          <div *ngIf="rental.status === 'Pending'" class="status-message pending">
+            <p><strong>⏳ Waiting for Owner Approval</strong></p>
+            <p>Your rental request has been sent to the item owner. You'll receive a notification once they respond.</p>
+          </div>
+
+          <div *ngIf="rental.status === 'Approved'" class="status-message approved">
+            <p><strong>✅ Request Approved!</strong></p>
+            <p>Great news! The owner has approved your rental request. You'll receive delivery details soon.</p>
+          </div>
+
+          <div *ngIf="rental.status === 'Rejected'" class="status-message rejected">
+            <p><strong>❌ Request Rejected</strong></p>
+            <p>Unfortunately, the owner couldn't approve your request at this time. Browse other available items!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

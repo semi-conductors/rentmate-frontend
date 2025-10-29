@@ -1,0 +1,118 @@
+<!-- rental-booking.component.html -->
+<div class="container">
+  <div class="header">
+    <div class="logo">Rent<span>Mate</span></div>
+    <p>Complete Your Rental Booking</p>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Booking Form -->
+    <div class="form-card">
+      <h2>📋 Booking Details</h2>
+
+      <!-- Item Preview -->
+      <div class="item-preview">
+        <h3>{{ itemDetails.name }}</h3>
+        <p>Item ID: #{{ itemDetails.id }} • ${{ itemDetails.dailyRate }}/day</p>
+      </div>
+
+      <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+        <!-- Date Selection -->
+        <div class="date-inputs">
+          <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input 
+              type="datetime-local" 
+              id="startDate" 
+              formControlName="startDate"
+              [class.error]="bookingForm.get('startDate')?.invalid && bookingForm.get('startDate')?.touched"
+            >
+            <span class="error-message" *ngIf="bookingForm.get('startDate')?.invalid && bookingForm.get('startDate')?.touched">
+              Start date is required
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input 
+              type="datetime-local" 
+              id="endDate" 
+              formControlName="endDate"
+              [class.error]="bookingForm.get('endDate')?.invalid && bookingForm.get('endDate')?.touched"
+            >
+            <span class="error-message" *ngIf="bookingForm.get('endDate')?.invalid && bookingForm.get('endDate')?.touched">
+              End date is required
+            </span>
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group">
+          <label for="address">Delivery/Pickup Address</label>
+          <input 
+            type="text" 
+            id="address" 
+            formControlName="renterAddress"
+            placeholder="Enter your complete address"
+            [class.error]="bookingForm.get('renterAddress')?.invalid && bookingForm.get('renterAddress')?.touched"
+          >
+          <span class="error-message" *ngIf="bookingForm.get('renterAddress')?.invalid && bookingForm.get('renterAddress')?.touched">
+            Address is required (minimum 10 characters)
+          </span>
+        </div>
+
+        <div class="info-badge">
+          ℹ️ All rentals require a 15% refundable deposit
+        </div>
+      </form>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="summary-card">
+      <h3>💰 Rental Summary</h3>
+
+      <div class="rental-duration">
+        <div class="days">{{ rentalDays || 0 }}</div>
+        <div class="label">Days</div>
+      </div>
+
+      <div class="summary-item">
+        <span>Daily Rate</span>
+        <span class="price">${{ itemDetails.dailyRate.toFixed(2) }}</span>
+      </div>
+
+      <div class="summary-item">
+        <span>Rental Duration</span>
+        <span>{{ rentalDays || 0 }} days</span>
+      </div>
+
+      <div class="summary-item highlight">
+        <span>Subtotal</span>
+        <span class="price">${{ subtotal.toFixed(2) }}</span>
+      </div>
+
+      <div class="summary-item">
+        <span>Deposit (15%)</span>
+        <span class="price">${{ deposit.toFixed(2) }}</span>
+      </div>
+
+      <div class="summary-item total">
+        <span>Total to Pay</span>
+        <span class="price">${{ totalAmount.toFixed(2) }}</span>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-submit" 
+        (click)="onSubmit()"
+        [disabled]="bookingForm.invalid"
+      >
+        Confirm Booking
+      </button>
+
+      <div class="info-badge" style="margin-top: 20px;">
+        🔒 Your deposit will be refunded after return
+      </div>
+    </div>
+  </div>
+</div>

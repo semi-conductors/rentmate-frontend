@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ItemResponseDTO } from '../../models/item.model';
 
 @Component({
@@ -13,7 +13,9 @@ import { ItemResponseDTO } from '../../models/item.model';
 export class RentalItemCardComponent {
   @Input({ required: true }) item!: ItemResponseDTO;
   
+  constructor(private router: Router) {}
+
   rentNow(): void {
-    // is not implemented yet!
+    this.router.navigate(['/booking', this.item.id]);
   }
 }
