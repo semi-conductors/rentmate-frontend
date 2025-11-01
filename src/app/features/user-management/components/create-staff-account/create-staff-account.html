@@ -1,0 +1,147 @@
+<div class="min-h-screen bg-[#000814] text-white font-display flex flex-col items-center py-10 px-4">
+  <div class="w-full max-w-3xl bg-[#000814] rounded-xl p-8 shadow-lg space-y-6">
+    <h1 class="text-3xl font-black">Create New Staff Account</h1>
+    <p class="text-gray-300">Fill out the form below to create a new staff account.</p>
+
+    @if (serverError()) {
+      <div class="p-3 bg-red-600/30 border border-red-500 rounded-lg text-red-200">
+        {{ serverError() }}
+      </div>
+    }
+
+    @if (success()) {
+      <div class="p-3 bg-green-600/30 border border-green-500 rounded-lg text-green-200">
+        Staff account created successfully!
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+
+      <!-- Role -->
+      <div>
+        <p class="pb-2 text-base font-medium">Role</p>
+        <div class="flex flex-wrap gap-3">
+          @for (r of roles; track r.value) {
+            <label
+              class="text-sm font-medium flex items-center justify-center rounded-lg border border-[#001D3D] bg-[#001D3D] px-4 h-11 text-white cursor-pointer has-[:checked]:border-[3px] has-[:checked]:border-[#FFC300] has-[:checked]:px-3.5"
+            >
+              {{ r.label }}
+              <input class="invisible absolute" type="radio" formControlName="role" [value]="r.value" />
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Name -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-base font-medium pb-2">First Name</label>
+          <input
+            formControlName="firstName"
+            placeholder="Enter first name"
+            class="w-full h-14 rounded-lg border border-[#001D3D] bg-[#001D3D] p-4 text-white focus:border-[#FFC300] focus:outline-none"
+          />
+          @if (f.firstName.touched && f.firstName.invalid) {
+            <p class="text-sm text-red-400 pt-1">First name must be 3–100 characters.</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-base font-medium pb-2">Last Name</label>
+          <input
+            formControlName="lastName"
+            placeholder="Enter last name"
+            class="w-full h-14 rounded-lg border border-[#001D3D] bg-[#001D3D] p-4 text-white focus:border-[#FFC300] focus:outline-none"
+          />
+          @if (f.lastName.touched && f.lastName.invalid) {
+            <p class="text-sm text-red-400 pt-1">Last name must be 3–100 characters.</p>
+          }
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-base font-medium pb-2">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="Enter email"
+          class="w-full h-14 rounded-lg border border-[#001D3D] bg-[#001D3D] p-4 text-white focus:border-[#FFC300] focus:outline-none"
+        />
+        @if (f.email.touched && f.email.invalid) {
+          <p class="text-sm text-red-400 pt-1">Enter a valid email address.</p>
+        }
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <label class="block text-base font-medium pb-2">Phone Number</label>
+        <input
+          type="tel"
+          formControlName="phoneNumber"
+          placeholder="Enter 11-digit phone number"
+          class="w-full h-14 rounded-lg border border-[#001D3D] bg-[#001D3D] p-4 text-white focus:border-[#FFC300] focus:outline-none"
+        />
+        @if (f.phoneNumber.touched && f.phoneNumber.invalid) {
+          <p class="text-sm text-red-400 pt-1">
+            Must be 11 digits and numeric only.
+          </p>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-base font-medium pb-2">Password</label>
+          <div class="flex items-center rounded-lg border border-[#001D3D] bg-[#001D3D]">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter password"
+              class="flex-1 h-14 p-4 bg-transparent border-none text-white focus:outline-none"
+            />
+            <button type="button" (click)="toggle('password')" class="px-4 text-gray-400 hover:text-white">
+              <span class="material-symbols-outlined">
+                {{ showPassword() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+          @if (f.password.touched && f.password.invalid) {
+            <p class="text-sm text-red-400 pt-1">Password must be 6–100 characters.</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-base font-medium pb-2">Confirm Password</label>
+          <div class="flex items-center rounded-lg border border-[#001D3D] bg-[#001D3D]">
+            <input
+              [type]="showConfirm() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="Confirm password"
+              class="flex-1 h-14 p-4 bg-transparent border-none text-white focus:outline-none"
+            />
+            <button type="button" (click)="toggle('confirm')" class="px-4 text-gray-400 hover:text-white">
+              <span class="material-symbols-outlined">
+                {{ showConfirm() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+          @if (passwordMismatch()) {
+            <p class="text-sm text-red-400 pt-1">Passwords do not match.</p>
+          }
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="pt-4">
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full md:w-auto h-14 px-8 rounded-lg bg-[#1E3A8A] text-white font-bold hover:bg-[#1E3A8A]/90 disabled:opacity-50"
+        >
+          @if (loading()) { Creating... } @else { Create Staff Account }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

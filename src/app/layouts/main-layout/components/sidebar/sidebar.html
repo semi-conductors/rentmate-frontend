@@ -1,0 +1,23 @@
+<aside
+  class="fixed top-16 sm:top-[72px] left-0 h-[calc(100%-64px)] sm:h-[calc(100%-72px)] w-64 bg-primary-dark p-4 flex-col justify-between sm:flex z-10"
+  [class.hidden]="!open()"
+  [class.flex]="open()"
+  role="navigation"
+  aria-label="Main navigation"
+>
+  <nav class="flex flex-col gap-2 mt-4">
+    @for (item of menu(); track item.label) {
+      @if (visible(item)) {
+        <a
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-text-light hover:bg-secondary-dark font-medium"
+          [routerLink]="item.route"
+          routerLinkActive="bg-secondary-dark"
+          aria-current="page"
+        >
+          <span class="material-symbols-outlined">{{ item.icon || 'chevron_right' }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    }
+  </nav>
+</aside>

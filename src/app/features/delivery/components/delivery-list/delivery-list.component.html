@@ -1,0 +1,66 @@
+<div class="delivery-list-container">
+  <header class="header">
+    <div class="header-content">
+      <h1 class="title">My deliveries</h1>
+      <p class="subtitle">{{ activeDeliveries().length }}  Active delivery</p>
+    </div>
+    <button class="refresh-btn" (click)="onRefresh()" [disabled]="loading()">
+      🔄
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="error-container">
+      <p class="error-text">{{ error() }}</p>
+      <button class="retry-btn" (click)="onRefresh()">Retry</button>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <div class="content">
+      <section class="section">
+        <h2 class="section-title">Active deliveries</h2>
+
+        @if (activeDeliveries().length === 0) {
+          <div class="empty-state">
+            <p>No active deliveries now.</p>
+          </div>
+        }
+
+        <div class="deliveries-list">
+          @for (delivery of activeDeliveries(); track delivery.id) {
+            <app-delivery-card
+              [delivery]="delivery"
+              [isCompleted]="false"
+              (complete)="onDeliveryComplete($event)"
+              (viewDetails)="onViewDetails($event)"
+            />
+          }
+        </div>
+      </section>
+
+      @if (completedDeliveries().length > 0) {
+        <section class="section">
+          <h2 class="section-title">Completed deliveries</h2>
+
+          <div class="deliveries-list">
+            @for (delivery of completedDeliveries(); track delivery.id) {
+              <app-delivery-card
+                [delivery]="delivery"
+                [isCompleted]="true"
+                (viewDetails)="onViewDetails($event)"
+              />
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+</div>

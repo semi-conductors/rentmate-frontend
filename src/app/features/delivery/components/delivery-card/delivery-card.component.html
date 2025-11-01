@@ -1,0 +1,45 @@
+<div
+  class="delivery-card"
+  [class.completed]="isCompleted"
+  (click)="onCardClick()"
+>
+  <div class="card-content">
+    <div class="icon-container">
+      <i class="package-icon">📦</i>
+    </div>
+
+    <div class="info-container">
+      <div class="header">
+        <div class="title-section">
+          <h3 class="customer-name">{{ pickupName() }}</h3>
+          <p class="order-number">{{ '#ORD-' + delivery.rentalId }}</p>
+        </div>
+        <i class="chevron-icon">›</i>
+      </div>
+
+      <div class="details">
+        <div class="detail-row">
+          <i class="icon">📍</i>
+          <p class="text">{{ pickupAddress() }}</p>
+        </div>
+        <div class="detail-row">
+          <i class="icon">🕐</i>
+          <p class="text">{{ formattedTime() }}</p>
+        </div>
+      </div>
+
+      @if (!isCompleted) {
+        <button class="complete-btn" (click)="onCompleteClick($event)">
+         Complete Delivery ✓
+        </button>
+      }
+
+      @if (isCompleted) {
+        <div class="completed-badge">
+          <i class="check-icon">✓</i>
+          <span>Completed</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

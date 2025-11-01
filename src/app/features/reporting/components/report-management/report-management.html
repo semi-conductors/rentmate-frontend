@@ -1,0 +1,347 @@
+<div class="flex-1 p-2 font-display text-white bg-[#000814] min-h-screen overflow-y-auto">
+  @if (loading()) {
+    <div class="flex items-center justify-center min-h-[400px]">
+      <div class="text-center">
+        <div class="text-[#FFC300] text-lg mb-2">Loading report details...</div>
+        <div class="text-gray-400 text-sm">Please wait</div>
+      </div>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="max-w-2xl mx-auto mt-8">
+      <div class="bg-[#7F1D1D] border border-red-500 text-[#FCA5A5] p-6 rounded-xl text-center">
+        <span class="material-symbols-outlined text-5xl mb-3">error</span>
+        <div class="text-lg font-semibold">{{ errorMessage() }}</div>
+      </div>
+    </div>
+  } @else if (report()) {
+    <div class="max-w-7xl mx-auto space-y-6">
+
+      <!-- Header with Status -->
+      <div class="bg-gradient-to-r from-[#001D3D] to-[#1e3a8a] rounded-xl p-6 shadow-xl">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <span class="material-symbols-outlined text-4xl text-[#FFC300]">report</span>
+              <h1 class="text-3xl font-black">Report #{{ report()?.id }}</h1>
+            </div>
+            <p class="text-gray-300 text-sm">Submitted {{ report()?.submittedAt | date:'MMM d, yyyy \'at\' h:mm a' }}</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wide"
+                  [ngClass]="{
+                    'bg-yellow-900/50 text-yellow-300 border border-yellow-500/50': report()?.status === 'PENDING',
+                    'bg-blue-900/50 text-blue-300 border border-blue-500/50': report()?.status === 'UNDER_REVIEW',
+                    'bg-green-900/50 text-green-300 border border-green-500/50': report()?.status === 'RESOLVED',
+                    'bg-gray-900/50 text-gray-300 border border-gray-500/50': report()?.status === 'DISMISSED'
+                  }">
+              <span class="material-symbols-outlined text-sm mr-2">
+                {{ report()?.status === 'PENDING' ? 'schedule' :
+                   report()?.status === 'UNDER_REVIEW' ? 'pending' :
+                   report()?.status === 'RESOLVED' ? 'check_circle' : 'cancel' }}
+              </span>
+              {{ report()?.status | spaceify}}
+            </span>
+            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wide"
+                  [ngClass]="{
+                    'bg-red-900/50 text-red-300 border border-red-500/50': report()?.reportType === 'FRAUD' || report()?.reportType === 'THIEVING',
+                    'bg-orange-900/50 text-orange-300 border border-orange-500/50': report()?.reportType === 'DAMAGE',
+                    'bg-yellow-900/50 text-yellow-300 border border-yellow-500/50': report()?.reportType === 'OVERDUE',
+                    'bg-purple-900/50 text-purple-300 border border-purple-500/50': report()?.reportType === 'FAKE_USER'
+                  }">
+              <span class="material-symbols-outlined text-sm mr-2">
+                {{ report()?.reportType === 'FRAUD' ? 'warning' :
+                   report()?.reportType === 'DAMAGE' ? 'broken_image' :
+                   report()?.reportType === 'OVERDUE' ? 'schedule' :
+                   report()?.reportType === 'FAKE_USER' ? 'person_off' : 'local_police' }}
+              </span>
+              {{ report()?.reportType | spaceify }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Details Card -->
+      <div class="bg-[#001d3d] rounded-xl p-6 shadow-lg">
+        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#FFC300]">description</span>
+          Report Details
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-gray-400 mt-1">category</span>
+            <div>
+              <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Report Type</div>
+              <div class="text-sm font-semibold">{{ report()?.reportType| spaceify}}</div>
+            </div>
+          </div>
+
+          @if (report()?.damagePercentage) {
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-gray-400 mt-1">percent</span>
+              <div>
+                <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Damage Percentage</div>
+                <div class="text-sm font-semibold">{{ report()?.damagePercentage }}%</div>
+              </div>
+            </div>
+          }
+
+          @if (report()?.relatedRentalId) {
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-gray-400 mt-1">inventory</span>
+              <div>
+                <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Related Rental</div>
+                <div class="text-sm font-semibold font-mono">#{{ report()?.relatedRentalId }}</div>
+              </div>
+            </div>
+          }
+
+          @if (report()?.relatedDeliveryId) {
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-gray-400 mt-1">local_shipping</span>
+              <div>
+                <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Related Delivery</div>
+                <div class="text-sm font-semibold font-mono">#{{ report()?.relatedDeliveryId }}</div>
+              </div>
+            </div>
+          }
+
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-gray-400 mt-1">calendar_today</span>
+            <div>
+              <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Submitted At</div>
+              <div class="text-sm font-semibold">{{ report()?.submittedAt | date:'MMM d, yyyy' }}</div>
+            </div>
+          </div>
+
+          @if (report()?.resolvedAt) {
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-gray-400 mt-1">check_circle</span>
+              <div>
+                <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Resolved At</div>
+                <div class="text-sm font-semibold">{{ report()?.resolvedAt | date:'MMM d, yyyy' }}</div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-gray-700">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-gray-400 mt-1">notes</span>
+            <div class="flex-1">
+              <div class="text-xs text-gray-400 uppercase tracking-wide mb-2">Report Description</div>
+              <div class="text-sm leading-relaxed bg-[#00284D] p-4 rounded-lg">
+                {{ report()?.details }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Involved -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Reporter Card -->
+        <div class="bg-[#001d3d] rounded-xl p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold flex items-center gap-2">
+              <span class="material-symbols-outlined text-blue-400">person</span>
+              Reporter
+            </h3>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                  [ngClass]="{
+                    'bg-green-900/50 text-green-300 border border-green-500/30': report()?.reporter?.accountActivity === 'ACTIVE',
+                    'bg-gray-900/50 text-gray-300 border border-gray-500/30': report()?.reporter?.accountActivity === 'INACTIVE',
+                    'bg-yellow-900/50 text-yellow-300 border border-yellow-500/30': report()?.reporter?.accountActivity === 'PENDING_REPORT_REVIEW',
+                    'bg-red-900/50 text-red-300 border border-red-500/30': report()?.reporter?.accountActivity === 'SUSPENDED_BY_ADMIN'
+                  }">
+              {{ report()?.reporter?.accountActivity| spaceify}}
+            </span>
+          </div>
+
+          <div class="flex items-center gap-4 mb-4 pb-4 border-b border-gray-700">
+            <div class="h-16 w-16 rounded-full bg-blue-900 flex items-center justify-center text-2xl font-bold text-blue-300">
+              {{ report()?.reporter?.username?.charAt(0)?.toUpperCase() }}
+            </div>
+            <div>
+              <div class="text-lg font-semibold">{{ report()?.reporter?.username }}</div>
+              <div class="text-sm text-gray-400">ID: #{{ report()?.reporter?.id }}</div>
+            </div>
+          </div>
+
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">mail</span>
+              <span class="text-gray-300">{{ report()?.reporter?.email }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">phone</span>
+              <span class="text-gray-300">{{ report()?.reporter?.phoneNumber }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">workspace_premium</span>
+              <span class="text-gray-300">{{ report()?.reporter?.role }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">
+                {{ report()?.reporter?.isVerified ? 'verified' : 'gpp_maybe' }}
+              </span>
+              <span class="text-gray-300" [class.text-green-400]="report()?.reporter?.isVerified">
+                {{ report()?.reporter?.isVerified ? 'Identity Verified' : 'Not Verified' }}
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">star</span>
+              <span class="text-[#FFC300] font-semibold">{{ report()?.reporter?.rating }}</span>
+              <span class="text-gray-400">({{ report()?.reporter?.totalRatings }} reviews)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">calendar_today</span>
+              <span class="text-gray-300">Member since {{ report()?.reporter?.memberSince | date:'MMM yyyy' }}</span>
+            </div>
+          </div>
+
+          <button
+            class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+            (click)="viewProfile(report()?.reporter?.id)">
+            <span class="material-symbols-outlined">person_search</span>
+            View Full Profile
+          </button>
+        </div>
+
+        <!-- Reported User Card -->
+        <div class="bg-[#001d3d] rounded-xl p-6 shadow-lg border-2 border-red-500/30">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold flex items-center gap-2">
+              <span class="material-symbols-outlined text-red-400">person_alert</span>
+              Reported User
+            </h3>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                  [ngClass]="{
+                    'bg-green-900/50 text-green-300 border border-green-500/30': report()?.reported?.accountActivity === 'ACTIVE',
+                    'bg-gray-900/50 text-gray-300 border border-gray-500/30': report()?.reported?.accountActivity === 'INACTIVE',
+                    'bg-yellow-900/50 text-yellow-300 border border-yellow-500/30': report()?.reported?.accountActivity === 'PENDING_REPORT_REVIEW',
+                    'bg-red-900/50 text-red-300 border border-red-500/30': report()?.reported?.accountActivity === 'SUSPENDED_BY_ADMIN'
+                  }">
+              {{ report()?.reported?.accountActivity | spaceify }}
+            </span>
+          </div>
+
+          <div class="flex items-center gap-4 mb-4 pb-4 border-b border-gray-700">
+            <div class="h-16 w-16 rounded-full bg-red-900 flex items-center justify-center text-2xl font-bold text-red-300">
+              {{ report()?.reported?.username?.charAt(0)?.toUpperCase() }}
+            </div>
+            <div>
+              <div class="text-lg font-semibold">{{ report()?.reported?.username }}</div>
+              <div class="text-sm text-gray-400">ID: #{{ report()?.reported?.id }}</div>
+            </div>
+          </div>
+
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">mail</span>
+              <span class="text-gray-300">{{ report()?.reported?.email }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">phone</span>
+              <span class="text-gray-300">{{ report()?.reported?.phoneNumber }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">workspace_premium</span>
+              <span class="text-gray-300">{{ report()?.reported?.role }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">
+                {{ report()?.reported?.isVerified ? 'verified' : 'gpp_maybe' }}
+              </span>
+              <span class="text-gray-300" [class.text-green-400]="report()?.reported?.isVerified">
+                {{ report()?.reported?.isVerified ? 'Identity Verified' : 'Not Verified' }}
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">star</span>
+              <span class="text-[#FFC300] font-semibold">{{ report()?.reported?.rating }}</span>
+              <span class="text-gray-400">({{ report()?.reported?.totalRatings }} reviews)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-sm">calendar_today</span>
+              <span class="text-gray-300">Member since {{ report()?.reported?.memberSince | date:'MMM yyyy' }}</span>
+            </div>
+          </div>
+
+          <button
+            class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-3 font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+            (click)="viewProfile(report()?.reported?.id)">
+            <span class="material-symbols-outlined">person_search</span>
+            View Full Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Resolution Panel -->
+      <div class="bg-gradient-to-br from-[#001d3d] to-[#1e3a8a] rounded-xl p-6 shadow-lg">
+        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#FFC300]">gavel</span>
+          Resolution Panel
+        </h3>
+        <div class="bg-[#000814] rounded-lg p-4 mb-4">
+          <label class="block text-sm font-semibold mb-2 text-gray-300">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">edit_note</span>
+            Resolution Notes
+          </label>
+          <textarea
+            [(ngModel)]="message"
+            placeholder="Provide a detailed explanation for your decision. This will be visible to all parties involved."
+            class="w-full rounded-lg p-4 bg-[#001d3d] border border-[#003566] focus:border-[#FFC300] focus:outline-none text-white placeholder-gray-500"
+            rows="5"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button 
+            class="bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg py-4 transition-colors flex items-center justify-center gap-2 shadow-lg"
+            (click)="onResolve()">
+            <span class="material-symbols-outlined">check_circle</span>
+            Resolve Report
+          </button>
+          <button 
+            class="bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg py-4 transition-colors flex items-center justify-center gap-2 shadow-lg"
+            (click)="onDismiss()">
+            <span class="material-symbols-outlined">cancel</span>
+            Dismiss Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Actions -->
+      <div class="bg-[#001d3d] rounded-xl p-6 shadow-lg border-2 border-[#FFC300]/30">
+        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#FFC300]">admin_panel_settings</span>
+          Administrative Actions
+        </h3>
+        <p class="text-sm text-gray-400 mb-6">
+          These actions will immediately affect the reported user's account and should be used carefully.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button 
+            class="bg-red-600 hover:bg-red-700 text-white py-4 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 shadow-lg"
+            (click)="onSuspend()">
+            <span class="material-symbols-outlined">block</span>
+            Suspend User Account
+          </button>
+          <button 
+            class="bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 shadow-lg"
+            (click)="onWithdraw()">
+            <span class="material-symbols-outlined">payments</span>
+            Process Financial Action
+          </button>
+        </div>
+        <div class="mt-4 bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-4 flex items-start gap-3">
+          <span class="material-symbols-outlined text-yellow-400">warning</span>
+          <div class="text-sm text-yellow-200">
+            <strong>Warning:</strong> These actions are permanent and will be logged. Make sure you have thoroughly reviewed all evidence before proceeding.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+</div>

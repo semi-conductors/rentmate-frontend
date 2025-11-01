@@ -1,0 +1,277 @@
+/* src/app/features/delivery/components/delivery-details/delivery-details.component.scss*/
+
+.delivery-details-container {
+  min-height: 100vh;
+  background-color: #0A1929;
+}
+
+.header {
+  background-color: #001D3D;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  background-color: #1E3A5F;
+  color: #FFC300;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #2A4A75;
+  }
+}
+
+.header-content {
+  flex: 1;
+}
+
+.title {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 4px 0;
+}
+
+.subtitle {
+  color: #94A3B8;
+  font-size: 14px;
+  margin: 0;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 16px;
+  color: #E2E8F0;
+
+  p {
+    margin: 16px 0;
+    font-size: 16px;
+  }
+}
+
+.spinner {
+  border: 4px solid #1E3A5F;
+  border-top: 4px solid #FFC300;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-text {
+  color: #EF4444;
+  text-align: center;
+}
+
+.retry-btn {
+  background-color: #FFC300;
+  color: #001D3D;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-card {
+  background-color: #1E3A5F;
+  border: 2px solid #FFC300;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.icon-container {
+  background-color: #FFC300;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-title {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.card-subtitle {
+  color: #94A3B8;
+  font-size: 14px;
+  margin: 4px 0 0 0;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  .icon {
+    font-size: 20px;
+    margin-top: 4px;
+  }
+}
+
+.info-content {
+  flex: 1;
+}
+
+.label {
+  color: #94A3B8;
+  font-size: 12px;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+}
+
+.value {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.sub-value {
+  color: #E2E8F0;
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+.divider {
+  height: 1px;
+  background-color: #334155;
+  margin: 8px 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+
+  &.highlight {
+    background-color: #0F2744;
+    border-radius: 8px;
+  }
+}
+
+.detail-label {
+  color: #94A3B8;
+  font-size: 14px;
+}
+
+.detail-value {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+
+  &.price {
+    color: #FFC300;
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
+
+.status-badge {
+  background-color: #1E3A8A;
+  color: #FFC300;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.completed {
+    background-color: #065F46;
+    color: #10B981;
+  }
+}
+
+.complete-btn {
+  background-color: #FFC300;
+  color: #001D3D;
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 195, 0, 0.3);
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(255, 195, 0, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .btn-icon {
+    font-size: 24px;
+  }
+}
+
+.completed-message {
+  background-color: #065F46;
+  color: #10B981;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+
+  .check-icon {
+    font-size: 24px;
+  }
+}

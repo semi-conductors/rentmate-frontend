@@ -1,0 +1,163 @@
+<div class="flex-1 p-8 font-display text-white bg-[#000814] min-h-screen">
+  <div class="flex flex-col gap-6">
+
+    <!-- Page Header -->
+    <div class="flex justify-between items-center">
+      <h1 class="text-4xl font-black leading-tight tracking-tight">Verification Requests</h1>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="flex flex-col gap-4 p-4 rounded-lg bg-[#001D3D] overflow-visible relative z-10">
+
+      <!-- Filters Row -->
+      <div class="flex gap-3 overflow-x-auto relative dropdown-container">
+
+        <!-- STATUS FILTER -->
+        <div class="relative">
+          <button
+            (click)="toggleDropdown('status')"
+            class="flex h-8 items-center gap-2 px-3 rounded-lg bg-[#00284D] hover:bg-[#FFC300]/30"
+          >
+            <span class="text-white text-sm font-medium">Status</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </button>
+
+          @if (dropdownOpen() === 'status') {
+            <div class="absolute z-20 mt-1 w-44 bg-[#001D3D] border border-[#003362] rounded-lg shadow-lg">
+              @for (option of statusOptions; track option.label) {
+                <button
+                  (click)="applyStatusFilter(option.value)"
+                  class="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-[#00284D]"
+                >
+                  {{ option.label }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- SORT FILTER -->
+        <div class="relative">
+          <button
+            (click)="toggleDropdown('sort')"
+            class="flex h-8 items-center gap-2 px-3 rounded-lg bg-[#00284D] hover:bg-[#FFC300]/30"
+          >
+            <span class="text-white text-sm font-medium">Sort By</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </button>
+
+          @if (dropdownOpen() === 'sort') {
+            <div class="absolute z-20 mt-1 w-52 bg-[#001D3D] border border-[#003362] rounded-lg shadow-lg">
+              @for (option of sortOptions; track option.label) {
+                <button
+                  (click)="applySort(option.value)"
+                  class="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-[#00284D]"
+                >
+                  {{ option.label }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto rounded-lg border border-[#003362] bg-[#001D3D]">
+      <table class="w-full text-left">
+        <thead class="bg-[#00284D]">
+          <tr>
+            <th class="px-4 py-3">Request ID</th>
+            <th class="px-4 py-3">User ID</th>
+            <th class="px-4 py-3">National ID</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Submitted At</th>
+            <th class="px-4 py-3">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="6" class="text-center py-6 text-gray-400">Loading...</td>
+            </tr>
+          } @else if (verifications().length === 0) {
+            <tr>
+              <td colspan="6" class="text-center py-6 text-gray-400">
+                No verification requests found.
+              </td>
+            </tr>
+          } @else {
+            @for (v of verifications(); track v.id) {
+              <tr class="border-t border-[#003362] hover:bg-[#00284D]/40 transition">
+                <td class="px-4 py-3 text-[#FFC300] font-semibold cursor-pointer hover:underline">
+                  #{{ v.id }}
+                </td>
+                <td class="px-4 py-3 text-gray-300">#{{ v.userId }}</td>
+                <td class="px-4 py-3 text-gray-300">{{ v.idNumber }}</td>
+
+                <td class="px-4 py-3">
+                  @switch (v.status) {
+                    @case ('APPROVED') {
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
+                        APPROVED
+                      </span>
+                    }
+                    @case ('REJECTED') {
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400">
+                        REJECTED
+                      </span>
+                    }
+                    @default {
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400">
+                        PENDING
+                      </span>
+                    }
+                  }
+                </td>
+
+                <td class="px-4 py-3 text-gray-300">
+                  {{ v.submittedAt | date: 'MMM d, y, h:mm a' }}
+                </td>
+
+                <td class="px-4 py-3">
+                  <button
+                    (click)="viewVerification(v)"
+                    class="h-8 px-4 rounded-lg bg-[#FFC300] text-black text-sm font-medium hover:bg-[#FFD60A]/80"
+                  >
+                    Review
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center mt-4">
+      <button
+        (click)="prevPage()"
+        [disabled]="!hasPrevious()"
+        class="flex items-center gap-2 h-9 px-4 rounded-lg bg-[#001D3D] hover:bg-[#FFC300]/30 disabled:opacity-50"
+      >
+        <span class="material-symbols-outlined">arrow_back</span>
+        Previous
+      </button>
+
+      <div class="text-gray-300 text-sm">
+        Page {{ page() }} / {{ totalPages() }} — {{ totalItems() }} requests
+      </div>
+
+      <button
+        (click)="nextPage()"
+        [disabled]="!hasNext()"
+        class="flex items-center gap-2 h-9 px-4 rounded-lg bg-[#001D3D] hover:bg-[#FFC300]/30 disabled:opacity-50"
+      >
+        Next
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+</div>

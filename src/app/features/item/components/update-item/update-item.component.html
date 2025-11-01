@@ -1,0 +1,88 @@
+<div class="update-item-container">
+  <h1>Update Item</h1>
+  <p class="subtitle">Update the details of your item below.</p>
+
+  @if (loading() && !itemData()) {
+    <div class="loading-message">Loading item details...</div>
+  }
+  @else if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+  @else if (itemData()) {
+    <form (ngSubmit)="onSubmit()" #itemForm="ngForm">
+      <div class="form-grid">
+        <!-- Image upload -->
+        <div class="form-group image-upload-group">
+          <!-- <label>Item Image</label> -->
+
+          @if (itemData()?.imageUrl && !selectedFileName()) {
+            <div class="current-image-preview">
+              <img [src]="itemData()?.imageUrl" alt="Current Item Image">
+              <span>Current Image</span>
+            </div>
+          }
+
+          <input type="file" (change)="onFileSelected($event)" id="imageUpload">
+          <label for="imageUpload" class="upload-area">
+            <span class="icon">🖼️</span>
+            <span>{{ selectedFileName() || 'Upload new item image (optional)' }}</span>
+          </label>
+        </div>
+
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title">Item Title</label>
+          <input id="title" type="text" name="title" [(ngModel)]="itemData()!.title" required>
+        </div>
+
+        <!-- Price -->
+        <div class="form-group">
+          <label for="price">Price ($/day)</label>
+          <input id="price" type="number" name="price" [(ngModel)]="itemData()!.price" required min="0.01" step="0.01">
+        </div>
+
+        <!-- Description -->
+        <div class="form-group description-group full-width">
+          <label for="description">Item Description</label>
+          <textarea id="description" name="description" [(ngModel)]="itemData()!.description" rows="4" required></textarea>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label for="category">Select category</label>
+          <select id="category" name="categoryId" [(ngModel)]="itemData()!.categoryId" required>
+            @for (cat of categories(); track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Availability -->
+        <div class="form-group">
+          <label for="availability">Availability</label>
+          <select id="availability" name="availability" [(ngModel)]="itemData()!.availability" required>
+            <option [ngValue]="true">Available</option>
+            <option [ngValue]="false">Unavailable</option>
+          </select>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group full-width">
+          <label for="address">Owner Address</label>
+          <input id="address" type="text" name="ownerAddress" [(ngModel)]="itemData()!.ownerAddress" required>
+        </div>
+      </div>
+
+      <button type="submit" class="update-button" [disabled]="loading()">
+        {{ loading() ? 'Updating...' : 'Update Item' }}
+      </button>
+    </form>
+  }
+  @else {
+    <div class="no-data-message">No item data available.</div>
+  }
+
+  @if (errorMessage()) {
+    <div class="server-error-message">{{ errorMessage() }}</div>
+  }
+</div>

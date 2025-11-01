@@ -1,0 +1,81 @@
+<div class="create-item-container">
+  <h1>Create New Item</h1>
+
+  <form (ngSubmit)="onSubmit()" #itemForm="ngForm">
+    <div class="form-grid">
+      <!-- Image upload -->
+      <div class="form-group image-upload-group">
+        <label for="imageFile">Item Image</label>
+        <input id="imageFile" type="file" (change)="onFileSelected($event)" required>
+        <label for="imageFile" class="upload-area">
+          <span class="icon">📸</span>
+          <span>{{ selectedFileName() || 'Upload Item Image' }}</span>
+        </label>
+        @if (!imageFile() && itemForm.submitted) {
+          <div class="error-message">Image is required.</div>
+        }
+      </div>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label for="title">Item Title</label>
+        <input id="title" type="text" name="title" [(ngModel)]="itemData().title" placeholder="Enter item title" required #title="ngModel">
+        @if (title.invalid && (title.dirty || title.touched || itemForm.submitted)) {
+          <div class="error-message">Title is required.</div>
+        }
+      </div>
+
+      <!-- Description -->
+      <div class="form-group description-group full-width">
+        <label for="description">Item Description</label>
+        <textarea id="description" name="description" [(ngModel)]="itemData().description"
+          placeholder="Enter item description" rows="4" required #description="ngModel"></textarea>
+        @if (description.invalid && (description.dirty || description.touched || itemForm.submitted)) {
+          <div class="error-message">Description is required.</div>
+        }
+      </div>
+
+      <!-- Price -->
+      <div class="form-group">
+        <label for="price">Price ($/day)</label>
+        <input id="price" type="number" name="price" [(ngModel)]="itemData().price" placeholder="Enter price (e.g., 29.99)"
+          required min="0.01" step="0.01" #price="ngModel">
+        @if (price.invalid && (price.dirty || price.touched || itemForm.submitted)) {
+          <div class="error-message">Valid price is required.</div>
+        }
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="category">Select category</label>
+        <select id="category" name="categoryId" [(ngModel)]="itemData().categoryId" required #categoryId="ngModel">
+          <option [ngValue]="null" disabled>Select category</option>
+          @for (cat of categories(); track cat.id) {
+            <option [ngValue]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+        @if (categoryId.invalid && (categoryId.dirty || categoryId.touched || itemForm.submitted)) {
+          <div class="error-message">Category is required.</div>
+        }
+      </div>
+
+      <!-- Address -->
+      <div class="form-group full-width">
+        <label for="address">Enter owner address</label>
+        <input id="address" type="text" name="ownerAddress" [(ngModel)]="itemData().ownerAddress"
+          placeholder="Enter owner address" required #address="ngModel">
+        @if (address.invalid && (address.dirty || address.touched || itemForm.submitted)) {
+          <div class="error-message">Owner address is required.</div>
+        }
+      </div>
+    </div>
+
+    <button type="submit" class="submit-button" [disabled]="loading()">
+      {{ loading() ? 'Creating...' : 'Create Item' }}
+    </button>
+  </form>
+
+  @if (errorMessage()) {
+    <div class="server-error-message">{{ errorMessage() }}</div>
+  }
+</div>

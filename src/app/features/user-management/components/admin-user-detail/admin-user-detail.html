@@ -1,0 +1,297 @@
+<main class="min-h-screen p-6 bg-[#000814] text-white">
+  @if (loadingUser()) {
+    <div class="flex items-center justify-center min-h-[400px]">
+      <div class="text-gray-400 text-lg">Loading user profile...</div>
+    </div>
+  } @else if (notFound()) {
+    <div class="flex items-center justify-center min-h-[400px]">
+      <div class="text-red-400 text-lg">User not found</div>
+    </div>
+  } @else {
+    <div class="max-w-7xl mx-auto space-y-6">
+      <!-- Header Section -->
+      <div class="bg-gradient-to-r from-[#001D3D] to-[#1e3a8a] rounded-xl p-8 shadow-xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="flex items-center gap-6">
+            <div class="h-24 w-24 rounded-full bg-[#FFC300] flex items-center justify-center text-4xl font-bold text-[#000814] shadow-lg">
+              {{ user()?.username?.charAt(0)?.toUpperCase() }}
+            </div>
+            <div>
+              <h1 class="text-3xl font-bold mb-2">{{ user()?.username }}</h1>
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide"
+                      [ngClass]="{
+                        'bg-green-900/50 text-green-300 border border-green-500/30': user()?.accountActivity === 'ACTIVE',
+                        'bg-gray-900/50 text-gray-300 border border-gray-500/30': user()?.accountActivity === 'INACTIVE',
+                        'bg-yellow-900/50 text-yellow-300 border border-yellow-500/30': user()?.accountActivity === 'PENDING_REPORT_REVIEW',
+                        'bg-red-900/50 text-red-300 border border-red-500/30': user()?.accountActivity === 'SUSPENDED_BY_ADMIN'
+                      }">
+                  <span class="material-symbols-outlined text-sm mr-1">
+                    {{ user()?.accountActivity === 'ACTIVE' ? 'check_circle' : 
+                       user()?.accountActivity === 'INACTIVE' ? 'pause_circle' :
+                       user()?.accountActivity === 'PENDING_REPORT_REVIEW' ? 'warning' : 'block' }}
+                  </span>
+                  {{ user()?.accountActivity  | spaceify }}
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide"
+                      [ngClass]="{
+                        'bg-purple-900/50 text-purple-300 border border-purple-500/30': user()?.role === 'ADMIN',
+                        'bg-orange-900/50 text-orange-300 border border-orange-500/30': user()?.role === 'MANAGER',
+                        'bg-blue-900/50 text-blue-300 border border-blue-500/30': user()?.role === 'DELIVERY_GUY',
+                        'bg-gray-900/50 text-gray-300 border border-gray-500/30': user()?.role === 'USER'
+                      }">
+                  <span class="material-symbols-outlined text-sm mr-1">
+                    {{ user()?.role === 'ADMIN' ? 'admin_panel_settings' : 
+                       user()?.role === 'MANAGER' ? 'supervised_user_circle' :
+                       user()?.role === 'DELIVERY_GUY' ? 'local_shipping' : 'person' }}
+                  </span>
+                  {{ user()?.role }}
+                </span>
+                @if (user()?.isVerified) {
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-900/50 text-green-300 border border-green-500/30">
+                    <span class="material-symbols-outlined text-sm mr-1">verified</span>
+                    VERIFIED
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-900/50 text-red-300 border border-red-500/30">
+                    <span class="material-symbols-outlined text-sm mr-1">gpp_maybe</span>
+                    NOT VERIFIED
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+          <button class="px-6 py-3 rounded-lg bg-[#FFC300] text-[#000814] font-bold hover:bg-[#ffcd33] transition-colors shadow-lg" (click)="openStatusModal()">
+            <span class="material-symbols-outlined align-middle mr-2">edit</span>
+            Manage User
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column: Contact & Account Info -->
+        <div class="lg:col-span-1 space-y-6">
+          <!-- Contact Information Card -->
+          <div class="bg-[#001D3D] rounded-xl p-6 shadow-lg">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#FFC300]">contact_mail</span>
+              Contact Information
+            </h2>
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-gray-400 mt-1">mail</span>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Email</div>
+                  <div class="text-sm font-medium break-all">{{ user()?.email }}</div>
+                </div>
+              </div>
+              <div class="h-px bg-gray-700"></div>
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-gray-400 mt-1">phone</span>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Phone Number</div>
+                  <div class="text-sm font-medium">{{ user()?.phoneNumber || 'Not provided' }}</div>
+                </div>
+              </div>
+              <div class="h-px bg-gray-700"></div>
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-gray-400 mt-1">badge</span>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">User ID</div>
+                  <div class="text-sm font-medium font-mono">#{{ user()?.id }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Details Card -->
+          <div class="bg-[#001D3D] rounded-xl p-6 shadow-lg">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#FFC300]">account_circle</span>
+              Account Details
+            </h2>
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-gray-400 mt-1">calendar_today</span>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Member Since</div>
+                  <div class="text-sm font-medium">{{ formatDate(user()?.memberSince) }}</div>
+                </div>
+              </div>
+              <div class="h-px bg-gray-700"></div>
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-gray-400 mt-1">workspace_premium</span>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">User Role</div>
+                  <div class="text-sm font-medium">{{ user()?.role }}</div>
+                </div>
+              </div>
+              <div class="h-px bg-gray-700"></div>
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-gray-400 mt-1">
+                  {{ user()?.isVerified ? 'verified_user' : 'gpp_maybe' }}
+                </span>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Identity Status</div>
+                  <div class="text-sm font-medium" [class.text-green-400]="user()?.isVerified" [class.text-red-400]="!user()?.isVerified">
+                    {{ user()?.isVerified ? 'Identity Verified' : 'Not Verified' }}
+                  </div>
+                </div>
+              </div>
+              <div class="h-px bg-gray-700"></div>
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-gray-400 mt-1">
+                  {{ user()?.accountActivity === 'ACTIVE' ? 'check_circle' : 
+                     user()?.accountActivity === 'INACTIVE' ? 'pause_circle' :
+                     user()?.accountActivity === 'PENDING_REPORT_REVIEW' ? 'warning' : 'block' }}
+                </span>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-400 uppercase tracking-wide mb-1">Account Status</div>
+                  <div class="text-sm font-medium"
+                       [ngClass]="{
+                         'text-green-400': user()?.accountActivity === 'ACTIVE',
+                         'text-gray-400': user()?.accountActivity === 'INACTIVE',
+                         'text-yellow-400': user()?.accountActivity === 'PENDING_REPORT_REVIEW',
+                         'text-red-400': user()?.accountActivity === 'SUSPENDED_BY_ADMIN'
+                       }">
+                    {{ user()?.accountActivity | spaceify}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rating Summary Card -->
+          <div class="bg-gradient-to-br from-[#001D3D] to-[#1e3a8a] rounded-xl p-6 shadow-lg">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#FFC300]">star</span>
+              Rating Summary
+            </h2>
+            <div class="text-center">
+              <div class="text-5xl font-bold text-[#FFC300] mb-2">
+                {{ (user()?.rating ?? 0).toFixed(1) }}
+              </div>
+              <div class="flex items-center justify-center gap-1 mb-3">
+                @for (s of [1,2,3,4,5]; track s) {
+                  <span class="material-symbols-outlined text-2xl" 
+                        [class.text-[#FFC300]]="s <= roundedRating" 
+                        [class.text-gray-600]="s > roundedRating">
+                    star
+                  </span>
+                }
+              </div>
+              <div class="text-sm text-gray-300">
+                Based on <span class="font-semibold text-white">{{ user()?.totalRatings ?? 0 }}</span> reviews
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Reviews -->
+        <div class="lg:col-span-2">
+          <div class="bg-[#001D3D] rounded-xl p-6 shadow-lg">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-2xl font-bold mb-1 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[#FFC300]">reviews</span>
+                  Performance Reviews
+                </h2>
+                <p class="text-sm text-gray-400">
+                  Showing reviews received by this user
+                </p>
+              </div>
+              <button class="px-4 py-2 rounded-lg bg-[#1e3a8a] hover:bg-[#2a4fa3] transition-colors flex items-center gap-2" (click)="onRatingRefreshClick()">
+                <span class="material-symbols-outlined text-sm">refresh</span>
+                Refresh
+              </button>
+            </div>
+
+            @if (ratingsLoading()) {
+              <div class="flex items-center justify-center py-12">
+                <div class="text-gray-400">Loading reviews...</div>
+              </div>
+            } @else if (ratings().length === 0) {
+              <div class="flex flex-col items-center justify-center py-12 text-center">
+                <span class="material-symbols-outlined text-6xl text-gray-600 mb-4">rate_review</span>
+                <div class="text-gray-400 text-lg">No reviews found</div>
+                <div class="text-gray-500 text-sm mt-2">This user hasn't received any reviews yet</div>
+              </div>
+            } @else {
+              <div class="space-y-4">
+                @for (r of ratings(); track r.id) {
+                  <div class="bg-[#00284D] rounded-lg p-5 hover:bg-[#003155] transition-colors border border-gray-700/50">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                          <button class="text-base font-semibold text-[#FFC300] hover:text-[#ffcd33] transition-colors flex items-center gap-2" 
+                                  (click)="openRaterAdmin(r.raterUserId)">
+                            <span class="material-symbols-outlined text-sm">person</span>
+                            {{ r.raterUserName }}
+                          </button>
+                          <span class="text-xs text-gray-500">•</span>
+                          <div class="text-sm text-gray-400 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">calendar_today</span>
+                            {{ r.createdAt | date:'MMM d, yyyy' }}
+                          </div>
+                        </div>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                          {{ r.feedback || 'No written feedback provided' }}
+                        </p>
+                        <div class="text-xs text-gray-500 mt-2">Review ID: #{{ r.id }}</div>
+                      </div>
+
+                      <div class="flex sm:flex-col items-center sm:items-end gap-2">
+                        <div class="flex gap-0.5">
+                          @for (i of [1,2,3,4,5]; track i) {
+                            <span class="material-symbols-outlined text-xl" 
+                                  [class.text-[#FFC300]]="i <= r.rating" 
+                                  [class.text-gray-600]="i > r.rating">
+                              star
+                            </span>
+                          }
+                        </div>
+                        <div class="text-lg font-bold text-[#FFC300]">{{ r.rating }}/5</div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Pagination -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-gray-700">
+                <button (click)="prevRatings()" 
+                        [disabled]="ratingsPage() === 1" 
+                        class="px-4 py-2 rounded-lg bg-[#1e3a8a] hover:bg-[#2a4fa3] disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">chevron_left</span>
+                  Previous
+                </button>
+                <div class="text-sm text-gray-400 text-center">
+                  <div class="font-medium text-white mb-1">Page {{ ratingsPage() }} of {{ ratingsTotalPages() }}</div>
+                  <div>{{ ratingsTotalItems() }} total reviews</div>
+                </div>
+                <button (click)="nextRatings()" 
+                        [disabled]="ratingsPage() === ratingsTotalPages()" 
+                        class="px-4 py-2 rounded-lg bg-[#1e3a8a] hover:bg-[#2a4fa3] disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                  Next
+                  <span class="material-symbols-outlined text-sm">chevron_right</span>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Status Modal -->
+  @if (showStatusModal()) {
+    <app-user-status-modal
+      [currentRole]="user()?.role"
+      [currentStatus]="user()?.accountActivity"
+      [currentReason]="null"
+      (save)="onSaveStatus($event)"
+      (cancel)="closeStatusModal()"
+    />
+  }
+</main>
