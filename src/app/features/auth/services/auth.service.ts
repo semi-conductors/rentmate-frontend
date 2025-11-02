@@ -13,6 +13,7 @@ export class AuthService {
   private readonly REFRESH_KEY = 'refresh_token';
   private readonly USER_KEY = 'auth_user';
 
+
   private accessToken = signal<string | null>(null);
   private refreshToken = signal<string | null>(null);
   private user = signal<User | null>(null);
@@ -21,6 +22,7 @@ export class AuthService {
   readonly currentUser = computed(() => this.user());
 
   private readonly baseUrl = `${AppConfig.userService}/auth`;
+
 
   constructor(private http: HttpClient, private router: Router) {
     // Load stored tokens and user
@@ -47,9 +49,9 @@ export class AuthService {
   }
 
   updateLocalStorageUser(username: string, phoneNumber: string){
-    const storedUser = this.user(); 
+    const storedUser = this.user();
     storedUser!.username = username;
-    storedUser!.phoneNumber = phoneNumber; 
+    storedUser!.phoneNumber = phoneNumber;
     this.user.set(storedUser);
     localStorage.setItem(this.USER_KEY, JSON.stringify(storedUser));
   }
@@ -63,7 +65,7 @@ export class AuthService {
           this.accessToken.set(res.accessToken);
           this.refreshToken.set(res.refreshToken);
           this.user.set(res.user);
-          this.router.navigate(['/']); 
+          this.router.navigate(['/']);
         })
       );
   }
@@ -75,7 +77,7 @@ export class AuthService {
       tap(() => {
           this.localLogout();
           this.router.navigate(['/']);
-      }), 
+      }),
       catchError((err) => {
         console.error('Logout failed', err);
         this.localLogout();
@@ -122,15 +124,15 @@ export class AuthService {
         })
       );
   }
-  
+
   requestPasswordReset(email: string) {
     return this.http.post(`${this.baseUrl}/password-reset/token`, { email });
   }
-  
+
   confirmPasswordReset(token: string, newPassword: string) {
     return this.http.post(`${this.baseUrl}/password-reset/confirm`, { token, newPassword });
   }
-  
+
   localLogout(){
     this.accessToken.set(null);
     this.refreshToken.set(null);
@@ -144,4 +146,7 @@ export class AuthService {
   getRefreshToken() {
     return this.refreshToken();
   }
+  userSignal() {
+  return this.user();
+}
 }

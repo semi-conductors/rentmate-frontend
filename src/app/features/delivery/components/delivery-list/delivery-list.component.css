@@ -1,0 +1,142 @@
+/* src/app/features/delivery/components/delivery-list/delivery-list.component.scss*/
+
+.delivery-list-container {
+  min-height: 100vh;
+  background-color: #0A1929;
+}
+
+.header {
+  background-color: #001D3D;
+  padding: 24px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.title {
+  color: #FFFFFF;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 4px 0;
+}
+
+.subtitle {
+  color: #94A3B8;
+  font-size: 14px;
+  margin: 0;
+}
+
+.refresh-btn {
+  background-color: #1E3A5F;
+  color: #FFC300;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #2A4A75;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 16px;
+  color: #E2E8F0;
+
+  p {
+    margin: 16px 0;
+    font-size: 16px;
+  }
+}
+
+.spinner {
+  border: 4px solid #1E3A5F;
+  border-top: 4px solid #FFC300;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-text {
+  color: #EF4444;
+  text-align: center;
+}
+
+.retry-btn {
+  background-color: #FFC300;
+  color: #001D3D;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0 8px;
+}
+
+.empty-state {
+  background-color: #1E3A5F;
+  border-radius: 12px;
+  padding: 32px 16px;
+  text-align: center;
+
+  p {
+    color: #94A3B8;
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+.deliveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

@@ -34,30 +34,45 @@ export const routes: Routes = [
   { path: 'verification/:id', loadComponent: () => import('./features/user-management/components/verification-management/verification-management').then(m => m.VerificationManagementComponent) },
   { path: 'admin/reports', loadComponent: () => import('./features/reporting/components/report-dashboard/report-dashboard').then(m => m.ReportDashboardComponent) },
   { path: 'admin/reports/:id', loadComponent: () => import('./features/reporting/components/report-management/report-management').then(m => m.ReportManagementComponent) },
-  
+
 // Item Service Routes
-  { 
-    path: 'items', 
-    loadComponent: () => import('./features/item/components/items/items.component').then(m => m.RentalsComponent) 
+  {
+    path: 'items',
+    loadComponent: () => import('./features/item/components/items/items.component').then(m => m.RentalsComponent)
   },
-  { 
-    path: 'items/:id', 
-    loadComponent: () => import('./features/item/components/item-details/item-details.component').then(m => m.ItemDetailsComponent) 
+  {
+    path: 'items/:id',
+    loadComponent: () => import('./features/item/components/item-details/item-details.component').then(m => m.ItemDetailsComponent)
   },
-  { 
-    path: 'my-items', 
-    loadComponent: () => import('./features/item/components/my-items/my-items.component').then(m => m.MyItemsComponent) 
+  {
+    path: 'my-items',
+    loadComponent: () => import('./features/item/components/my-items/my-items.component').then(m => m.MyItemsComponent)
   },
-  { 
-    path: 'create-item', 
-    loadComponent: () => import('./features/item/components/create-item/create-item.component').then(m => m.CreateItemComponent) 
+  {
+    path: 'create-item',
+    loadComponent: () => import('./features/item/components/create-item/create-item.component').then(m => m.CreateItemComponent)
   },
-  { 
-    path: 'update-item/:id', 
-    loadComponent: () => import('./features/item/components/update-item/update-item.component').then(m => m.UpdateItemComponent) 
+  {
+    path: 'update-item/:id',
+    loadComponent: () => import('./features/item/components/update-item/update-item.component').then(m => m.UpdateItemComponent)
   },
   {
     path: 'admin/categories',
     loadComponent: () => import('./features/category/components/category-management/category-management.component').then(m => m.CategoryManagementComponent),
   },
+
+  // delivery routes
+// Add these routes
+{
+  path: 'deliveries',
+  loadComponent: () => import('./features/delivery/components/delivery-list/delivery-list.component')
+    .then(m => m.DeliveryListComponent)
+},
+{
+  path: 'deliveries/:id',
+  loadComponent: () => import('./features/delivery/components/delivery-details/delivery-details.component')
+    .then(m => m.DeliveryDetailsComponent)
+},
+
+
 ];

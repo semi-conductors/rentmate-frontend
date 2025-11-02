@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { DeliveryListComponent } from '../../../delivery/components/delivery-list/delivery-list.component';
 
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [FormsModule, RouterLink, CommonModule],
+  imports: [FormsModule, RouterLink, CommonModule ],
   templateUrl: './login.html',
 })
 export class LoginComponent {
@@ -37,7 +38,14 @@ export class LoginComponent {
     this.auth.login(this.email(), this.password()).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/']);
+        // المفروض اتشيك هنا ع الرول
+        const user = this.auth.userSignal();
+        const role = user?.role;
+          if(role === 'DELIVERY_GUY') {
+          this.router.navigate(['/deliveries']); // Changed from '/delivery-list'
+        } else {
+          this.router.navigate(['/']);
+        }
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
