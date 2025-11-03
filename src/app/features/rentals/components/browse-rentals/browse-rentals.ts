@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { RentalRequest } from '../../models/rental-request';
 import { RentalService } from '../../services/rental-service';
 import { CommonModule } from '@angular/common';
@@ -13,27 +13,24 @@ import { ItemService } from '../../services/item-service';
 })
 
 export class BrowseRentals implements OnInit {
-  requests: RentalRequest[] = [];
-  selectedRequest: RentalRequest | null = null;
-  isModalOpen = false;
+  requests = signal<RentalRequest[]>([]);
+  selectedRequest = signal<RentalRequest | null>(null);
+  isModalOpen = signal(false);
+  isLoading = signal(false);
 
-  // Pagination
-  currentPage = 0;
-  pageSize = 10;
-  totalPages = 0;
-  totalRequests = 0;
+  currentPage = signal(0);
+  pageSize = signal(10);
+  totalPages = signal(0);
+  totalRequests = signal(0);
 
-  // Stats
-  pendingCount = 0;
-  todayCount = 0;
-  totalRevenue = 0;
-
-  isLoading = false;
+  pendingCount = signal(0);
+  todayCount = signal(0);
+  totalRevenue = signal(0);
 
   constructor(
     private rentalService: RentalService,
-    private itemService:ItemService,
-    private cdr:ChangeDetectorRef
+    private itemService: ItemService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -41,94 +38,91 @@ export class BrowseRentals implements OnInit {
   }
 
   loadPendingRequests(): void {
-    this.isLoading = true;
-    this.rentalService.getPendingRentalsByOwnerId( this.currentPage, this.pageSize)
+    this.isLoading.set(true);
+    this.rentalService.getPendingRentalsByOwnerId(this.currentPage(), this.pageSize())
       .subscribe({
         next: (response) => {
-          this.requests = response.content || [];
-          this.totalPages = response.totalPages || 0;
-          this.totalRequests = response.totalElements || 0;
+          const list = response.content || [];
+          this.requests.set(list);
+          this.totalPages.set(response.totalPages || 0);
+          this.totalRequests.set(response.totalElements || list.length);
 
-          // Enrich each request with item details
           this.enrichRequestsWithItemDetails();
-
-          // Calculate stats
           this.calculateStats();
 
-          this.isLoading = false;
-          this.cdr.detectChanges();
+          this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Error loading requests:', error);
-          this.isLoading = false;
+          this.isLoading.set(false);
         }
       });
   }
 
   enrichRequestsWithItemDetails(): void {
-    this.requests.forEach(request => {
-      // Calculate rental days
+    this.requests().forEach(request => {
       const start = new Date(request.startDate);
       const end = new Date(request.endDate);
       request.rentalDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 
-      // Fetch item details
       this.rentalService.getItemDetails(request.itemId).subscribe({
         next: (item) => {
           request.itemName = item.title || 'Item #' + request.itemId;
           request.itemIcon = item.icon || '📦';
-          this.cdr.detectChanges();
+          this.requests.update(reqs => [...reqs]); // trigger UI update
         },
-      //  this.itemService.getItemById(request.itemId).subscribe({
-      //   next: (item) => {
-      //     request.itemName = item.title || 'Item #' + request.itemId;
-      //     request.itemIcon = item.imageUrl || '📦';
-      //     this.cdr.detectChanges();
-      //   },
         error: (error) => {
           console.error('Error fetching item details:', error);
           request.itemName = 'Item #' + request.itemId;
           request.itemIcon = '📦';
+          this.requests.update(reqs => [...reqs]);
         }
       });
     });
   }
 
   calculateStats(): void {
-    this.pendingCount = this.totalRequests;
+    this.pendingCount.set(this.totalRequests());
 
-    // Calculate today's requests
     const today = new Date().toDateString();
-    this.todayCount = this.requests.filter(r =>
+    const todayCount = this.requests().filter(r =>
       new Date(r.createdDate).toDateString() === today
     ).length;
+    this.todayCount.set(todayCount);
 
-    // Calculate total revenue
-    this.totalRevenue = this.requests.reduce((sum, r) => sum + r.totalPrice, 0);
+    const totalRevenue = this.requests().reduce((sum, r) => sum + r.totalPrice, 0);
+    this.totalRevenue.set(totalRevenue);
   }
 
   openModal(request: RentalRequest): void {
-    this.selectedRequest = request;
-    this.isModalOpen = true;
+    this.selectedRequest.set(request);
+    this.isModalOpen.set(true);
     document.body.style.overflow = 'hidden';
   }
 
   closeModal(): void {
-    this.selectedRequest = null;
-    this.isModalOpen = false;
+    this.selectedRequest.set(null);
+    this.isModalOpen.set(false);
     document.body.style.overflow = 'auto';
   }
 
   approveRental(): void {
-    if (!this.selectedRequest) return;
+    const request = this.selectedRequest();
+    if (!request) return;
 
-    const rentalId = this.selectedRequest.rentalId;
-
-    this.rentalService.approveRental(rentalId).subscribe({
-      next: (response) => {
+    this.rentalService.approveRental(request.rentalId).subscribe({
+      next: () => {
         alert('Rental approved successfully! ✅');
+
+        this.requests.update(reqs =>
+          reqs.filter(r => r.rentalId !== request.rentalId)
+        );
+
+        // Update counts
+        this.pendingCount.update(count => count - 1);
+        this.totalRevenue.update(revenue => revenue - request.totalPrice);
         this.closeModal();
-        this.loadPendingRequests(); // Reload the list
+        // this.loadPendingRequests();
       },
       error: (error) => {
         console.error('Error approving rental:', error);
@@ -138,19 +132,24 @@ export class BrowseRentals implements OnInit {
   }
 
   rejectRental(): void {
-    if (!this.selectedRequest) return;
+    const request = this.selectedRequest();
+    if (!request) return;
 
-    if (!confirm('Are you sure you want to reject this rental request?')) {
-      return;
-    }
+    if (!confirm('Are you sure you want to reject this rental request?')) return;
 
-    const rentalId = this.selectedRequest.rentalId;
-
-    this.rentalService.rejectRental(rentalId).subscribe({
-      next: (response) => {
+    this.rentalService.rejectRental(request.rentalId).subscribe({
+      next: () => {
         alert('Rental rejected! ❌');
+        // Remove from list immediately
+        this.requests.update(reqs =>
+          reqs.filter(r => r.rentalId !== request.rentalId)
+        );
+
+        // Update counts
+        this.pendingCount.update(count => count - 1);
+        this.totalRevenue.update(revenue => revenue - request.totalPrice);
         this.closeModal();
-        this.loadPendingRequests(); // Reload the list
+        //this.loadPendingRequests();
       },
       error: (error) => {
         console.error('Error rejecting rental:', error);
@@ -160,15 +159,15 @@ export class BrowseRentals implements OnInit {
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.currentPage.update(v => v + 1);
       this.loadPendingRequests();
     }
   }
 
   previousPage(): void {
-    if (this.currentPage > 0) {
-      this.currentPage--;
+    if (this.currentPage() > 0) {
+      this.currentPage.update(v => v - 1);
       this.loadPendingRequests();
     }
   }
@@ -176,24 +175,16 @@ export class BrowseRentals implements OnInit {
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     });
   }
 
   formatDateShort(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year: 'numeric', month: 'short', day: 'numeric'
     });
   }
-
-  
-
 
 }

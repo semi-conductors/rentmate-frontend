@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RentalService } from '../../services/rental-service';
 import { CommonModule } from '@angular/common';
@@ -6,97 +6,115 @@ import { ItemService } from '../../services/item-service';
 
 @Component({
   selector: 'app-rental-details',
-  standalone:true,
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './rental-details.html',
   styleUrl: './rental-details.css'
 })
-export class RentalDetails implements OnInit{
-  rentalId!:number;
-  rental: any = null;
-  itemDetails: any = null;
-  isLoading = true;
-  rentalDays = 0;
+export class RentalDetails implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private rentalService = inject(RentalService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private rentalService: RentalService,
-    private itemService:ItemService,
-    private cdr:ChangeDetectorRef
-  ) {}
+  rentalId = signal<number | null>(null);
+  rental = signal<any | null>(null);
+  itemDetails = signal<any | null>(null);
+  isLoading = signal(true);
+  isCancelling = signal(false);
+
+  rentalDays = computed(() => {
+    const rentalValue = this.rental();
+    if (!rentalValue) return 0;
+    const start = new Date(rentalValue.startDate);
+    const end = new Date(rentalValue.endDate);
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  });
 
   ngOnInit(): void {
-    // Get rental ID from route params
     this.route.params.subscribe(params => {
-      this.rentalId = +params['id'];
-      this.loadRentalDetails();
+      const id = +params['id'];
+      this.rentalId.set(id);
+      this.loadRentalDetails(id);
     });
   }
 
-  loadRentalDetails(): void {
-    this.isLoading = true;
+  private loadRentalDetails(id: number): void {
+    this.isLoading.set(true);
 
-    this.rentalService.getRentalById(this.rentalId).subscribe({
+    this.rentalService.getRentalById(id).subscribe({
       next: (rental) => {
-        this.rental = rental;
-        
-        // Calculate rental days
-        const start = new Date(rental.startDate);
-        const end = new Date(rental.endDate);
-        this.rentalDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-        
-        // Load item details
+        this.rental.set(rental);
         this.loadItemDetails(rental.itemId);
-         this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error loading rental details:', error);
         alert('Failed to load rental details');
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }
 
-  loadItemDetails(itemId: number): void {
+  private loadItemDetails(itemId: number): void {
     this.rentalService.getItemDetails(itemId).subscribe({
       next: (item) => {
-        this.itemDetails = item;
-        this.isLoading = false;
-        this.cdr.detectChanges();
+        this.itemDetails.set(item);
+        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error loading item details:', error);
-        this.isLoading = false;
+        this.isLoading.set(false);
+      }
+    });
+  }
+  cancelRental(): void {
+    const rental = this.rental();
+    if (!rental || rental.status !== 'Pending') return;
+
+    if (!confirm('Are you sure you want to cancel this rental request? This action cannot be undone.')) {
+      return;
+    }
+
+    this.isCancelling.set(true);
+
+    this.rentalService.cancelRental(rental.rentalId).subscribe({
+      next: () => {
+        alert('Rental request cancelled successfully! 🚫');
+        this.router.navigate(['/my-rentals']);
+      },
+      error: (error) => {
+        console.error('Error cancelling rental:', error);
+        alert(error.error?.message || 'Failed to cancel rental request.');
+        this.isCancelling.set(false);
       }
     });
   }
 
+
   getStatusColor(status: string): string {
-    const colors: any = {
-      'Pending': '#f59e0b',
-      'Approved': '#10b981',
-      'Rejected': '#ef4444',
-      'Completed': '#6366f1'
+    const colors: Record<string, string> = {
+      Pending: '#f59e0b',
+      Approved: '#10b981',
+      Rejected: '#ef4444',
+      Completed: '#6366f1'
     };
     return colors[status] || '#94a3b8';
   }
 
   getStatusIcon(status: string): string {
-    const icons: any = {
-      'Pending': '⏳',
-      'Approved': '✅',
-      'Rejected': '❌',
-      'Completed': '🎉'
+    const icons: Record<string, string> = {
+      Pending: '⏳',
+      Approved: '✅',
+      Rejected: '❌',
+      Completed: '🎉'
     };
     return icons[status] || '📋';
   }
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -106,5 +124,4 @@ export class RentalDetails implements OnInit{
   goBack(): void {
     this.router.navigate(['/my-rentals']);
   }
-
 }

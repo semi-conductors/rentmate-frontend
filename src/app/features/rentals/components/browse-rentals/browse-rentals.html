@@ -1,4 +1,3 @@
-<!-- browse-rentals.component.html -->
 <div class="container">
   <div class="header">
     <div class="logo">Rent<span>Mate</span></div>
@@ -6,157 +5,139 @@
     <p class="page-subtitle">Review and manage your pending rental requests</p>
   </div>
 
-  <!-- Stats Bar -->
+  <!-- Stats -->
   <div class="stats-bar">
     <div class="stat-card">
       <div class="label">Pending Requests</div>
-      <div class="value">{{ pendingCount }}</div>
+      <div class="value">{{ pendingCount() }}</div>
     </div>
     <div class="stat-card">
       <div class="label">Today's Requests</div>
-      <div class="value">{{ todayCount }}</div>
+      <div class="value">{{ todayCount() }}</div>
     </div>
     <div class="stat-card">
       <div class="label">Total Revenue (Pending)</div>
-      <div class="value">${{ totalRevenue.toFixed(2) }}</div>
+      <div class="value">${{ totalRevenue().toFixed(2) }}</div>
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="empty-state">
-    <div class="icon">⏳</div>
-    <h3>Loading requests...</h3>
-  </div>
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="empty-state">
+      <div class="icon">⏳</div>
+      <h3>Loading requests...</h3>
+    </div>
+  }
 
-  <!-- Empty State -->
-  <div *ngIf="!isLoading && requests.length === 0" class="empty-state">
-    <div class="icon">📭</div>
-    <h3>No Pending Requests</h3>
-    <p>You don't have any pending rental requests at the moment.</p>
-  </div>
+  <!-- Empty -->
+  @if (!isLoading() && requests().length === 0) {
+    <div class="empty-state">
+      <div class="icon">📭</div>
+      <h3>No Pending Requests</h3>
+      <p>You don't have any pending rental requests.</p>
+    </div>
+  }
 
   <!-- Requests Grid -->
-  <div class="requests-grid" *ngIf="!isLoading && requests.length > 0">
-    <div 
-      class="request-card" 
-      *ngFor="let request of requests"
-      (click)="openModal(request)"
-    >
-      <div class="request-icon">{{ request.itemIcon || '📦' }}</div>
-      <div class="request-info">
-        <div class="item-name">{{ request.itemName || 'Loading...' }}</div>
-        <div class="dates">
-          📅 {{ formatDateShort(request.startDate) }} → {{ formatDateShort(request.endDate) }} 
-          ({{ request.rentalDays }} days)
+  @if (!isLoading() && requests().length > 0) {
+    <div class="requests-grid">
+      @for (request of requests(); track request.rentalId) {
+        <div class="request-card" (click)="openModal(request)">
+          <div class="request-icon">{{ request.itemIcon || '📦' }}</div>
+          <div class="request-info">
+            <div class="item-name">{{ request.itemName || 'Loading...' }}</div>
+            <div class="dates">
+              📅 {{ formatDateShort(request.startDate) }} → {{ formatDateShort(request.endDate) }} 
+              ({{ request.rentalDays }} days)
+            </div>
+            <div class="request-id">Request #{{ request.rentalId }}</div>
+          </div>
+          <div class="request-price">
+            <div class="amount">${{ request.totalPrice.toFixed(2) }}</div>
+            <div class="label">Total</div>
+          </div>
         </div>
-        <div class="request-id">Request #{{ request.rentalId }}</div>
-      </div>
-      <div class="request-price">
-        <div class="amount">${{ request.totalPrice.toFixed(2) }}</div>
-        <div class="label">Total</div>
-      </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- Pagination -->
-  <div class="pagination" *ngIf="!isLoading && requests.length > 0">
-    <button 
-      (click)="previousPage()" 
-      [disabled]="currentPage === 0"
-    >
-      ← Previous
-    </button>
-    <span class="page-info">
-      Page <strong>{{ currentPage + 1 }}</strong> of <strong>{{ totalPages }}</strong>
-    </span>
-    <button 
-      (click)="nextPage()" 
-      [disabled]="currentPage >= totalPages - 1"
-    >
-      Next →
-    </button>
-  </div>
-</div>
-
-<!-- Modal -->
-<div class="modal-overlay" [class.active]="isModalOpen" (click)="closeModal()">
-  <div class="modal" (click)="$event.stopPropagation()" *ngIf="selectedRequest">
-    <div class="modal-header">
-      <h2>📋 Rental Request Details</h2>
-      <button class="close-btn" (click)="closeModal()">×</button>
+  @if (!isLoading() && requests().length > 0) {
+    <div class="pagination">
+      <button (click)="previousPage()" [disabled]="currentPage() === 0">← Previous</button>
+      <span class="page-info">
+        Page <strong>{{ currentPage() + 1 }}</strong> of <strong>{{ totalPages() }}</strong>
+      </span>
+      <button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1">Next →</button>
     </div>
+  }
 
-    <div class="modal-body">
-      <!-- Item Preview -->
-      <div class="item-preview-modal">
-        <div class="icon">{{ selectedRequest?.itemIcon || '📦' }}</div>
-        <div class="info">
-          <h4>{{ selectedRequest?.itemName }}</h4>
-          <p>Item ID: #{{ selectedRequest?.itemId }}</p>
+  <!-- Modal -->
+  @if (isModalOpen() && selectedRequest()) {
+    <div class="modal-overlay active" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>📋 Rental Request Details</h2>
+          <button class="close-btn" (click)="closeModal()">×</button>
         </div>
-      </div>
 
-      <!-- Rental Details -->
-      <div class="detail-section">
-        <h3>📅 Rental Period</h3>
-        <div class="detail-item">
-          <span class="label">Start Date</span>
-          <span class="value">{{ formatDate(selectedRequest?.startDate!) }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">End Date</span>
-          <span class="value">{{ formatDate(selectedRequest?.endDate!) }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Duration</span>
-          <span class="value highlight">{{ selectedRequest?.rentalDays }} Days</span>
-        </div>
-      </div>
+        <div class="modal-body">
+          <div class="item-preview-modal">
+            <div class="icon">{{ selectedRequest()?.itemIcon || '📦' }}</div>
+            <div class="info">
+              <h4>{{ selectedRequest()?.itemName }}</h4>
+              <p>Item ID: #{{ selectedRequest()?.itemId }}</p>
+            </div>
+          </div>
 
-      <!-- Renter Details -->
-      <div class="detail-section">
-        <h3>👤 Renter Information</h3>
-        <div class="detail-item">
-          <span class="label">Delivery Address</span>
-          <span class="value">{{ selectedRequest?.renterAddress }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Request Date</span>
-          <span class="value">{{ formatDate(selectedRequest?.createdDate!) }}</span>
-        </div>
-      </div>
+          <div class="detail-section">
+            <h3>📅 Rental Period</h3>
+            <div class="detail-item">
+              <span class="label">Start</span>
+              <span class="value">{{ formatDate(selectedRequest()?.startDate!) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">End</span>
+              <span class="value">{{ formatDate(selectedRequest()?.endDate!) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Duration</span>
+              <span class="value highlight">{{ selectedRequest()?.rentalDays }} Days</span>
+            </div>
+          </div>
 
-      <!-- Price Breakdown -->
-      <div class="detail-section">
-        <h3>💰 Price Breakdown</h3>
-        <div class="price-breakdown">
-          <div class="price-row">
-            <span>Daily Rate</span>
-            <span class="amount">${{ (selectedRequest?.rentalPrice! / selectedRequest?.rentalDays!).toFixed(2) }}</span>
+          <div class="detail-section">
+            <h3>👤 Renter Information</h3>
+            <div class="detail-item">
+              <span class="label">Address</span>
+              <span class="value">{{ selectedRequest()?.renterAddress }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Requested</span>
+              <span class="value">{{ formatDate(selectedRequest()?.createdDate!) }}</span>
+            </div>
           </div>
-          <div class="price-row">
-            <span>Rental Duration</span>
-            <span>{{ selectedRequest?.rentalDays }} days</span>
+
+          <div class="detail-section">
+            <h3>💰 Price Breakdown</h3>
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>Daily Rate</span>
+                <span class="amount">${{ (selectedRequest()?.rentalPrice! / selectedRequest()?.rentalDays!).toFixed(2) }}</span>
+              </div>
+              <div class="price-row total">
+                <span>Total Amount</span>
+                <span class="amount">${{ selectedRequest()?.totalPrice!.toFixed(2) }}</span>
+              </div>
+            </div>
           </div>
-          <div class="price-row">
-            <span>Subtotal</span>
-            <span class="amount">${{ selectedRequest?.rentalPrice!.toFixed(2) }}</span>
-          </div>
-          <div class="price-row">
-            <span>Deposit (15%)</span>
-            <span class="amount">${{ selectedRequest?.depositAmount!.toFixed(2) }}</span>
-          </div>
-          <div class="price-row total">
-            <span>Total Amount</span>
-            <span class="amount">${{ selectedRequest?.totalPrice!.toFixed(2) }}</span>
-          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-approve" (click)="approveRental()">✓ Approve</button>
+          <button class="btn-reject" (click)="rejectRental()">✗ Reject</button>
         </div>
       </div>
     </div>
-
-    <div class="modal-actions">
-      <button class="btn-approve" (click)="approveRental()">✓ Approve Request</button>
-      <button class="btn-reject" (click)="rejectRental()">✗ Reject Request</button>
-    </div>
-  </div>
+  }
 </div>

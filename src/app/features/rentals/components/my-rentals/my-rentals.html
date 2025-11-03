@@ -1,0 +1,102 @@
+<!-- all-rentals.component.html -->
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">Rent<span>Mate</span></div>
+    <h1 class="page-title">📦 All My Rentals</h1>
+    <p class="page-subtitle">View and manage all your rental history</p>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="label">Total Rentals</div>
+      <div class="value">{{ totalRentals() }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Pending</div>
+      <div class="value pending">{{ pendingCount() }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Completed</div>
+      <div class="value completed">{{ completedCount() }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Rejected</div>
+      <div class="value rejected">{{ rejectedCount() }}</div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner">⏳</div>
+      <p>Loading your rentals...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && rentals().length === 0) {
+    <div class="empty-state">
+      <div class="icon">📭</div>
+      <h3>No Rentals Yet</h3>
+      <p>You don't have any rental requests.</p>
+      <button class="btn-browse" routerLink="/browse-items">
+        Browse Available Items
+      </button>
+    </div>
+  }
+
+  <!-- Rentals Grid -->
+  @if (!isLoading() && rentals().length > 0) {
+    <div class="rentals-grid">
+      @for (rental of rentals(); track rental.rentalId) {
+        <div 
+          class="rental-card"
+          (click)="viewDetails(rental.rentalId)"
+        >
+          <!-- Icon -->
+          <div class="rental-icon">{{ rental.itemIcon || '📦' }}</div>
+          
+          <!-- Info -->
+          <div class="rental-info">
+            <div class="item-name">{{ rental.itemName || 'Loading...' }}</div>
+            <div class="dates">
+              📅 {{ formatDate(rental.startDate) }} → {{ formatDate(rental.endDate) }} 
+              ({{ rental.rentalDays }} days)
+            </div>
+          </div>
+
+          <!-- Status Badge -->
+          <div 
+            class="rental-status" 
+            [style.background-color]="getStatusColor(rental.status) + '20'"
+            [style.border-color]="getStatusColor(rental.status)"
+            [style.color]="getStatusColor(rental.status)"
+          >
+            {{ getStatusIcon(rental.status) }} {{ rental.status }}
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button 
+        (click)="previousPage()" 
+        [disabled]="currentPage() === 0"
+      >
+        ← Previous
+      </button>
+      <span class="page-info">
+        Page <strong>{{ currentPage() + 1 }}</strong> of <strong>{{ totalPages() }}</strong>
+      </span>
+      <button 
+        (click)="nextPage()" 
+        [disabled]="currentPage() >= totalPages() - 1"
+      >
+        Next →
+      </button>
+    </div>
+  }
+</div>
