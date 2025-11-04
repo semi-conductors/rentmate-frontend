@@ -1,0 +1,79 @@
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-[#002147] text-white rounded-xl p-6 md:p-8 w-full max-w-2xl relative">
+    <h2 class="text-2xl font-bold mb-6">File a New Report</h2>
+
+    <form (ngSubmit)="submit()" class="space-y-6">
+      <!-- Report Type -->
+      <div>
+        <p class="text-base font-medium mb-2">Report Type <span class="text-[#FFC40C]">*</span></p>
+        <div class="flex flex-col gap-3">
+          @for (type of ['FRAUD','DAMAGE','OVERDUE','FAKE_USER','THIEVING']; track type) {
+            <label class="flex items-center gap-3 p-3 border border-white/20 rounded-lg hover:bg-white/10 cursor-pointer">
+              <input type="radio"
+                     [value]="type"
+                     name="reportType"
+                     [(ngModel)]="reportType"
+                     (ngModelChange)="reportType.set($event)"
+                     class="h-5 w-5 accent-[#FFC40C]">
+              <span class="text-sm font-medium">{{ type.replace('_',' ') }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div>
+        <p class="text-base font-medium mb-2">
+          Detailed description <span class="text-[#FFC40C]">*</span>
+        </p>
+        <textarea
+          [(ngModel)]="details"
+          (ngModelChange)="details.set($event)"
+          name="details"
+          rows="5"
+          placeholder="Describe what happened in detail..."
+          class="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-[#FFC40C] outline-none resize-y"></textarea>
+        <p class="text-sm text-gray-400 mt-1">
+          Minimum {{ minLength() }} characters. ({{ details().length }}/{{ minLength() }})
+        </p>
+      </div>
+
+      <!-- Damage percentage -->
+      @if (reportType() === 'DAMAGE') {
+        <div>
+          <p class="text-base font-medium mb-2">
+            Damage Percentage <span class="text-[#FFC40C]">*</span>
+          </p>
+          <input
+            type="number"
+            [(ngModel)]="damagePercentage"
+            (ngModelChange)="damagePercentage.set($event)"
+            name="damagePercentage"
+            placeholder="Enter damage percentage (0-100)"
+            min="0"
+            max="100"
+            class="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-[#FFC40C] outline-none">
+        </div>
+      }
+
+      <!-- Error -->
+      @if (errorMessage()) {
+        <div class="text-red-400 text-sm">{{ errorMessage() }}</div>
+      }
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3 pt-4">
+        <button type="button"
+                (click)="close()"
+                class="px-5 py-2.5 rounded-lg bg-gray-600 hover:bg-gray-500 text-white font-medium">
+          Cancel
+        </button>
+        <button type="submit"
+                [disabled]="!isValid() || loading()"
+                class="px-6 py-2.5 rounded-lg bg-[#FFC40C] text-[#002147] font-bold hover:bg-yellow-400 disabled:opacity-60">
+          {{ loading() ? 'Submitting...' : 'Submit Report' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { PagedReportsResponse } from '../models/paged.report';
 import { AppConfig } from '../../../core/config/app.config';
 import { ReportDetailsResponse } from '../models/report.details.response';
+import { CreateReportRequest } from '../models/create.report';
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
@@ -49,4 +50,8 @@ export class ReportService {
   releaseLock(id: number): Promise<void> {
     return firstValueFrom(this.http.post<void>(`${this.baseUrl}/${id}/release`, {}));
   }
+
+  createReport(body: CreateReportRequest): Observable<any> {
+    return this.http.post(this.baseUrl, body);
+  }  
 }
