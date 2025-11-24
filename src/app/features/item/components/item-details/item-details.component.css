@@ -1,7 +1,6 @@
-/* تنسيقات القاعدة للصفحة والحاوية الرئيسية */
 :host {
     display: block;
-    background-color: #001D3D; /* خلفية داكنة جداً */
+    background-color: #001D3D; 
     min-height: 100vh;
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,7 +27,6 @@ h1 {
     padding-bottom: 15px;
 }
 
-/* رسائل التحميل والخطأ */
 .loading, .error {
     text-align: center;
     padding: 20px;
@@ -48,19 +46,15 @@ h1 {
     color: #ffe0e0;
 }
 
-
-/* 🚨 الحل: استخدام Flexbox لضمان عدم خروج المحتوى */
 .details-grid {
     display: flex;
     gap: 30px; 
-    align-items: flex-start; /* محاذاة للأعلى */
+    align-items: flex-start; 
 }
 
-/* قسم الصورة */
 .image-wrapper {
-    /* 🚨 تحديد عرض ثابت للصورة */
     flex-basis: 400px; 
-    flex-shrink: 0; /* منع الصورة من الانكماش */
+    flex-shrink: 0; 
     height: 300px; 
     overflow: hidden; 
     border-radius: 10px;
@@ -73,18 +67,14 @@ h1 {
     object-fit: cover; 
     display: block;
 }
-
-/* قسم المعلومات */
 .info-content {
-    flex-grow: 1; /* السماح للمعلومات بأخذ المساحة المتبقية */
+    flex-grow: 1; 
     display: flex;
     flex-direction: column;
     gap: 10px; 
-    /* 🚨 إضافة عرض أقصى لضمان عدم خروج النصوص الطويلة */
     min-width: 0; 
 }
 
-/* رأس قسم المعلومات (العنوان والحالة) */
 .header {
     display: flex;
     justify-content: space-between;
@@ -98,12 +88,9 @@ h1 {
     font-size: 1.8rem;
     font-weight: 600;
     margin: 0;
-    /* 🚨 حل مشكلة النصوص الطويلة */
     word-break: break-word; 
-    max-width: 70%; /* إعطاء مساحة للحالة */
+    max-width: 70%; 
 }
-
-/* شارة الحالة */
 .status {
     padding: 6px 15px;
     border-radius: 20px;
@@ -111,15 +98,14 @@ h1 {
     font-size: 0.9rem;
     color: #121212;
     text-transform: uppercase;
-    background-color: #FFC300; /* اللون الافتراضي للتأجير */
+    background-color: #FFC300; 
 }
 
 .status.available {
-    background-color: #238636; /* أخضر للمتاح */
+    background-color: #238636; 
     color: white;
 }
 
-/* السعر */
 .price {
     font-size: 1.4rem;
     font-weight: 700;
@@ -127,24 +113,21 @@ h1 {
     margin: 0 0 15px 0;
 }
 
-/* الوصف */
 .description {
     line-height: 1.6;
     color: #b0b0b0;
     margin-bottom: 20px;
     font-size: 0.95rem;
-    /* 🚨 حل مشكلة النصوص الطويلة */
     word-break: break-word; 
 }
 
-/* الخط الفاصل */
+
 hr {
     border: none;
     border-top: 1px solid #2f4560;
     margin: 20px 0;
 }
 
-/* البيانات الوصفية (الفئة وعنوان المالك) */
 .meta {
     display: flex;
     flex-direction: column;
@@ -156,7 +139,7 @@ hr {
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #2f4560; /* خط صلب للفصل */
+    border-bottom: 1px solid #2f4560; 
 }
 
 .meta-item:last-child {
@@ -164,25 +147,24 @@ hr {
 }
 
 .meta-item strong {
-    color: #a0a0a0; /* لون خفيف للتسمية */
+    color: #a0a0a0; 
     font-weight: 500;
-    flex-basis: 30%; /* تحديد عرض التسمية */
+    flex-basis: 30%; 
     flex-shrink: 0;
 }
 
 .meta-item span {
-    color: #ffffff; /* لون أبيض للقيمة */
+    color: #ffffff; 
     font-weight: 600;
     text-align: right;
     flex-grow: 1;
-    /* 🚨 حل مشكلة النصوص الطويلة */
+   
     word-break: break-word; 
 }
 
-/* --- استجابة الشاشات (Mobile Responsiveness) --- */
 @media (max-width: 768px) {
     .details-grid {
-        flex-direction: column; /* تحويل العرض إلى عمود واحد */
+        flex-direction: column; 
         gap: 20px;
     }
 
@@ -208,7 +190,7 @@ hr {
     }
 
     .meta-item {
-        flex-direction: column; /* التسمية والقيمة في سطرين */
+        flex-direction: column; 
         align-items: flex-start;
         gap: 5px;
     }
@@ -222,4 +204,25 @@ hr {
         text-align: left;
         width: 100%;
     }
+}
+.contact-owner-button {
+    margin-top: 30px;
+    padding: 14px 32px;
+    background-color: #FFC300;
+    color: #000;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+}
+
+.contact-owner-button:hover {
+    background-color: #e0b200;   
+}
+
+.contact-owner-button:active {
+    background-color: #cc9f00;
 }

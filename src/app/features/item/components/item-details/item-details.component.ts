@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ItemService } from '../../services/item.service';
 import { ItemResponseDTO } from '../../models/item.model';
 
@@ -13,6 +13,7 @@ import { ItemResponseDTO } from '../../models/item.model';
 })
 export class ItemDetailsComponent {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private itemService = inject(ItemService);
 
   item = signal<ItemResponseDTO | null>(null);
@@ -36,6 +37,12 @@ export class ItemDetailsComponent {
         this.error.set('Failed to load item details.');
         this.loading.set(false);
       }
-    });
+    }); 
   }
+  goToOwnerDetails(): void {
+        const ownerId = this.item()?.ownerId;
+        if (ownerId) {
+           this.router.navigate(['/user', ownerId]);
+        }
+      }
 }
