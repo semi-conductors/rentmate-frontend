@@ -116,7 +116,10 @@ export class AuthService {
           this.accessToken.set(res.accessToken);
           this.refreshToken.set(res.refreshToken);
           this.user.set(res.user);
-          this.router.navigate(['/']);
+          this.http.post(`http://localhost:8181/payment/createowner`, 
+            { userId: res.user.id, name: res.user.username, email: res.user.email }).subscribe((res : any)=>{
+              window.open(res.location , '_blank');
+            });
         }),
         catchError((err) => {
           console.error('Registration failed:', err);

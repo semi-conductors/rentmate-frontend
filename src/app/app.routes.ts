@@ -13,8 +13,8 @@ import { MyRentals } from './features/rentals/components/my-rentals/my-rentals';
 
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/items', pathMatch: 'full' },
+  { path: '', redirectTo: '/items', pathMatch: 'full' },
   { path: 'booking/:itemId', component: BookingForm },
   { path: 'browse-rentals', component: BrowseRentals },
   { path: 'rental-details/:id', component: RentalDetails },

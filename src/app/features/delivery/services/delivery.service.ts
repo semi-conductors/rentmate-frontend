@@ -8,7 +8,7 @@ import { Delivery, DeliveryDetailsResponse } from '../models/delivery.model';
   providedIn: 'root',
 })
 export class DeliveryService {
-  private apiUrl = 'http://localhost:8282/api/deliveries';
+  private apiUrl = 'http://localhost:8383/api/deliveries';
   // ✅ استخدام inject لـ HttpClient بدلاً من constructor
   private http = inject(HttpClient);
   // private authService = inject(AuthService); // يمكن إزالتها إذا لم يتم استخدامها
