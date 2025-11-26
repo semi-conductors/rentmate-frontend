@@ -10,6 +10,8 @@ import { BookingForm } from './features/rentals/components/booking-form/booking-
 import { BrowseRentals } from './features/rentals/components/browse-rentals/browse-rentals';
 import { RentalDetails } from './features/rentals/components/rental-details/rental-details';
 import { MyRentals } from './features/rentals/components/my-rentals/my-rentals';
+import { OwnerDashboard } from './features/rentals/components/owner-dashboard/owner-dashboard';
+import { PaymentForm } from './features/payment/components/payment-form/payment-form';
 
 
 export const routes: Routes = [
@@ -19,6 +21,8 @@ export const routes: Routes = [
   { path: 'browse-rentals', component: BrowseRentals },
   { path: 'rental-details/:id', component: RentalDetails },
   { path: 'my-rentals', component: MyRentals },
+  {path: 'owner-dashboard',component: OwnerDashboard},
+  {path: 'payment-form/:id',component: PaymentForm},
   { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent) },
   { path: 'browse', loadComponent: () => import('./pages/browse/browse').then(m => m.BrowseComponent) },
   { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) },

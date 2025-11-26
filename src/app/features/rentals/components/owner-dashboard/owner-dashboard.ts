@@ -1,19 +1,19 @@
-import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ItemService } from '../../services/item-service';
+import { OwnerRental } from '../../models/owner-rental';
 import { RentalService } from '../../services/rental-service';
-import { RentalRequest } from '../../models/rental-request';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-my-rentals',
+  selector: 'app-owner-dashboard',
   imports: [CommonModule],
-  templateUrl: './my-rentals.html',
-  styleUrl: './my-rentals.css'
+  templateUrl: './owner-dashboard.html',
+  styleUrl: './owner-dashboard.css'
 })
-export class MyRentals implements OnInit {
-  rentals = signal<RentalRequest[]>([]);
+export class OwnerDashboard implements OnInit {
+  rentals = signal<OwnerRental[]>([]);
   isLoading = signal(false);
+  selectedStatus = signal<string | null>(null);
 
   currentPage = signal(0);
   pageSize = signal(10);
@@ -21,23 +21,21 @@ export class MyRentals implements OnInit {
   totalRentals = signal(0);
 
   // Stats
-  pendingCount = signal(0);
-  approvedCount = signal(0);
-  rejectedCount = signal(0);
-
+  totalRevenue = signal(0);
   constructor(
     private router: Router,
     private rentalService: RentalService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.loadAllRentals();
+    this.loadRentals(null);
   }
 
-  loadAllRentals(): void {
+  loadRentals(status: string | null): void {
     this.isLoading.set(true);
+    this.selectedStatus.set(status);
 
-    this.rentalService.getAllRentalsByRenter(this.currentPage(), this.pageSize())
+    this.rentalService.getAllRentalsByOwner(this.currentPage(), this.pageSize(), status)
       .subscribe({
         next: (response) => {
           const list = response.content || [];
@@ -45,39 +43,42 @@ export class MyRentals implements OnInit {
           this.totalPages.set(response.totalPages || 0);
           this.totalRentals.set(response.totalElements || list.length);
 
-          if(list.length > 0) {
-            this.enrichRentalsWithDetails();
-          }
-
+          this.enrichRentalsWithDetails();
           this.calculateStats();
+
           this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Error loading rentals:', error);
-          this.rentals.set([]);
+          this.rentals.set([]); 
           this.totalPages.set(0);
           this.totalRentals.set(0);
           this.isLoading.set(false);
+
         }
       });
   }
 
   enrichRentalsWithDetails(): void {
     this.rentals().forEach(rental => {
+      // Calculate rental days
       const start = new Date(rental.startDate);
       const end = new Date(rental.endDate);
       rental.rentalDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      rental.isExpanded = false;
 
+      // Fetch item details
       this.rentalService.getItemDetails(rental.itemId).subscribe({
         next: (item) => {
           rental.itemName = item.title || 'Item #' + rental.itemId;
           rental.itemIcon = item.icon || '📦';
-          this.rentals.update(r => [...r]); 
+          this.rentals.update(reqs => [...reqs]);
         },
-        error: () => {
+        error: (error) => {
+          console.error('Error fetching item details:', error);
           rental.itemName = 'Item #' + rental.itemId;
           rental.itemIcon = '📦';
-          this.rentals.update(r => [...r]);
+          this.rentals.update(reqs => [...reqs]);
         }
       });
     });
@@ -85,41 +86,68 @@ export class MyRentals implements OnInit {
 
   calculateStats(): void {
     const rentals = this.rentals();
-    this.pendingCount.set(rentals.filter(r => r.status === 'Pending').length);
-    this.approvedCount.set(rentals.filter(r => r.status === 'Approved').length);
-    this.rejectedCount.set(rentals.filter(r => r.status === 'Rejected').length);
+    this.totalRevenue.set(rentals.reduce((sum, r) => sum + r.totalPrice, 0));
   }
 
-  viewDetails(rentalId: number): void {
-    this.router.navigate(['/rental-details', rentalId]);
+  filterByStatus(status: string | null): void {
+    this.currentPage.set(0);
+    this.loadRentals(status);
   }
 
-  goToPayment(rental: any, event: Event): void {
-  event.stopPropagation();
-  this.router.navigate(['/payment-form', rental.rentalId]);
-}
-
+  toggleDetails(rentalId: number): void {
+    this.rentals.update(rentals =>
+      rentals.map(rental =>
+        rental.rentalId === rentalId
+          ? { ...rental, isExpanded: !rental.isExpanded }
+          : rental
+      )
+    );
+  }
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  formatDateShort(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   }
 
   getStatusColor(status: string): string {
     const colors: Record<string, string> = {
-      Pending: '#f59e0b',
-      Approved: '#10b981',
-      Rejected: '#ef4444',
-      Completed: '#6366f1',
-     
+      Pending: '#fbbf24',
+      Approved: '#34d399',
+      Rejected: '#f87171',
+      Completed: '#818cf8'
     };
     return colors[status] || '#94a3b8';
+  }
+
+  getStatusIcon(status: string): string {
+    const icons: Record<string, string> = {
+      Pending: '⏳',
+      Approved: '✅',
+      Rejected: '❌',
+      Completed: '🎉'
+    };
+    return icons[status] || '📋';
   }
 
   nextPage(): void {
     if (this.currentPage() < this.totalPages() - 1) {
       this.currentPage.update(v => v + 1);
-      this.loadAllRentals();
+      this.loadRentals(this.selectedStatus());
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
@@ -127,10 +155,10 @@ export class MyRentals implements OnInit {
   previousPage(): void {
     if (this.currentPage() > 0) {
       this.currentPage.update(v => v - 1);
-      this.loadAllRentals();
+      this.loadRentals(this.selectedStatus());
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
+
+
 }
-
-

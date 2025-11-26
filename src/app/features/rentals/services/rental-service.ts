@@ -46,6 +46,17 @@ export class RentalService {
 
     return this.http.get<any>(`${this.apiUrl}/renter`, { params });
   }
+  getAllRentalsByOwner(pageNum: number, pageSize: number, status: string | null): Observable<any> {
+  let params = new HttpParams()
+    .set('pageNum', pageNum.toString())
+    .set('pageSize', pageSize.toString());
+  
+  if (status) {
+    params = params.set('status', status);
+  }
+
+  return this.http.get<any>(`${this.apiUrl}/all/owner`, { params });
+}
   cancelRental(rentalId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${rentalId}`);
   }

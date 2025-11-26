@@ -61,8 +61,8 @@
   color: #f59e0b;
 }
 
-.stat-card .value.completed {
-  color: #6366f1;
+.stat-card .value.approved {
+  color: #10b981;
 }
 
 .stat-card .value.rejected {
@@ -137,6 +137,52 @@
   gap: 5px;
   align-self: center;
   border: 2px solid;
+}
+
+.rental-price {
+  text-align: center;
+  padding: 15px;
+  background: #0f2744;
+  border-radius: 10px;
+}
+
+.rental-price .amount {
+  color: #d4a01e;
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.rental-price .label {
+  color: #94a3b8;
+  font-size: 0.85em;
+}
+
+.btn-pay {
+  padding: 14px 24px;
+  background: #d4a01e;
+  color: #0a1628;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn-pay:hover {
+  background: #e8b42e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 160, 30, 0.3);
+}
+
+.btn-pay:active {
+  transform: translateY(0);
 }
 
 .empty-state {
