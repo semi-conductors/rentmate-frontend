@@ -18,11 +18,13 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
+  isLocked = signal(false); // UI lock state
   report = signal<ReportDetailsResponse | null>(null);
   loading = signal(true);
   errorMessage = signal<string | null>(null);
   message = signal('');
   lockRefresher?: Subscription;
+  canReview = signal(true);
 
   async ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -33,15 +35,20 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
 
     await this.loadReport(id);
 
-    // Every 25 minutes refresh lock
-    this.lockRefresher = interval(25 * 60 * 1000).subscribe(() => {
-      this.reportService.refreshLock(id).catch(() =>
-        console.warn('Failed to refresh lock')
-      );
+    if(this.report()?.status !== 'PENDING') this.canReview.set(false);
+    
+    this.reportService.refreshLock(id).then(() => this.isLocked.set(true)).catch(() =>{
+      console.warn('Failed to refresh lock');
+      this.isLocked.set(false)
     });
 
-    // Release lock on page unload
-    window.addEventListener('beforeunload', this.releaseLock);
+    // Every 25 minutes refresh lock
+    this.lockRefresher = interval(25 * 60 * 1000).subscribe(() => {
+      this.reportService.refreshLock(id).then(() => this.isLocked.set(true)).catch(() =>{
+        console.warn('Failed to refresh lock');
+        this.isLocked.set(false)
+      });
+    });
   }
 
   async loadReport(id: number) {
@@ -49,10 +56,26 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     try {
       const data = await this.reportService.getReportDetails(id);
       this.report.set(data);
+      if (data.resolutionNotes) 
+        this.message.set(data.resolutionNotes);
     } catch {
       this.errorMessage.set('Failed to load report details.');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async startReview() {
+    const report = this.report();
+    if (!report) return;
+
+    try {
+      await this.reportService.claimReport(report.id);
+      this.isLocked.set(true);
+      alert("You are now reviewing this report. It is locked for others.");
+      await this.loadReport(report.id);
+    } catch {
+      this.errorMessage.set("Failed to claim report lock.");
     }
   }
 
@@ -88,15 +111,29 @@ export class ReportManagementComponent implements OnInit, OnDestroy {
     alert('not implemented yet');
   }
 
-  private releaseLock = async () => {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (id) await this.reportService.releaseLock(id).catch(() => {});
-  };
+  // private releaseLock = async () => {
+  //   const id = Number(this.route.snapshot.paramMap.get('id'));
+  //   if (id) await this.reportService.releaseLock(id).catch(() => {});
+  // };
+
+  async releaseReviewLock() {
+    const report = this.report();
+    if (!report) return;
+
+    try {
+      await this.reportService.releaseLock(report.id);
+      this.isLocked.set(false);
+      alert("You have released the lock.");
+    } catch {
+      this.errorMessage.set("Failed to release lock.");
+    }
+  }
+
 
   async ngOnDestroy() {
     this.lockRefresher?.unsubscribe();
-    await this.releaseLock();
-    window.removeEventListener('beforeunload', this.releaseLock);
+    // await this.releaseLock();
+    // window.removeEventListener('beforeunload', this.releaseLock);
   }
 
   viewProfile(userId: number | undefined) {

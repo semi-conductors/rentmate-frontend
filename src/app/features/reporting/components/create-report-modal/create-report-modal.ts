@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, input, output, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../auth/services/auth.service';
@@ -15,10 +15,10 @@ export class CreateReportModalComponent {
   private reportService = inject(ReportService);
   private authService = inject(AuthService);
 
+
   // --- Inputs ---
-  reportedUserId = signal<number | null>(null);
-  relatedRentalId = signal<number | null>(null);
-  relatedDeliveryId = signal<number | null>(null);
+  relatedRentalId = input<number | null>(null);
+  relatedDeliveryId = input<number | null>(null);
 
   // --- State signals ---
   reportType = signal<'FRAUD' | 'DAMAGE' | 'OVERDUE' | 'FAKE_USER' | null>(null);
@@ -28,8 +28,10 @@ export class CreateReportModalComponent {
   errorMessage = signal<string | null>(null);
 
   // --- Control signals for modal state ---
-  isOpen = signal(false);
+  //isOpen = signal(false);
   submitted = signal(false);
+
+
 
   // --- Computed validation ---
   minLength = computed(() =>
@@ -59,8 +61,6 @@ export class CreateReportModalComponent {
     }
 
     const payload = {
-      reportedUserId: this.reportedUserId(),
-      reporterUserId: reporter.id,
       reportType: this.reportType(),
       details: this.details().trim(),
       relatedRentalId: this.relatedRentalId(),
@@ -85,11 +85,13 @@ export class CreateReportModalComponent {
     });
   }
 
-  // --- Helpers ---
-  open(data: { reportedUserId: number; relatedRentalId: number; relatedDeliveryId: number }) {
-    this.reportedUserId.set(data.reportedUserId);
-    this.relatedRentalId.set(data.relatedRentalId);
-    this.relatedDeliveryId.set(data.relatedDeliveryId);
+  isOpen = model(false); // or use input/output pair
+  
+  close(): void {
+    this.isOpen.set(false);
+  }
+  
+  open(data?: { relatedRentalId?: number; relatedDeliveryId?: number }) {
     this.isOpen.set(true);
     this.submitted.set(false);
     this.reportType.set(null);
@@ -98,9 +100,6 @@ export class CreateReportModalComponent {
     this.errorMessage.set(null);
   }
 
-  close(): void {
-    this.isOpen.set(false);
-  }
 
   setType(type: 'FRAUD' | 'DAMAGE' | 'OVERDUE' | 'FAKE_USER' ): void {
     this.reportType.set(type);

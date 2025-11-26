@@ -27,6 +27,11 @@ export class MainLayoutComponent implements OnInit {
     return role === 'ADMIN' || role === 'MANAGER';
   });
 
+  showNavbar = computed(() => {
+    const role = this.currentUser()?.role ?? '';
+    return role !== 'DELIVERY_GUY';
+  });
+
   constructor(){
       // reactively watch user state
       effect(() => {

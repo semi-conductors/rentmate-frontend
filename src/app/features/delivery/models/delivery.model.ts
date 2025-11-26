@@ -48,6 +48,7 @@ export interface Delivery {
 
 export interface DeliveryDetailsResponse {
   id: number;
+  rentalId?: number;
   type: string;
   status: string;
   pickupName: string;

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DeliveryService } from '../../services/delivery.service';
@@ -19,7 +19,7 @@ export class DeliveryListComponent implements OnInit {
   private allDeliveries = signal<Delivery[]>([]);
   public loading = signal(false);
   public error = signal<string | null>(null);
-
+  
   // ✅ استخدام الـ computed signals لفلترة البيانات
   public activeDeliveries = computed(() =>
     this.allDeliveries().filter(

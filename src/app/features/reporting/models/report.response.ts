@@ -12,4 +12,5 @@ export interface ReportResponse {
   damagePercentage?: number;
   submittedAt: string;
   resolvedAt?: string;
+  resolutionNotes?: string;
 }

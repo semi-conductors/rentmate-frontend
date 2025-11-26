@@ -276,43 +276,79 @@
         </div>
       </div>
 
-      <!-- Resolution Panel -->
-      <div class="bg-gradient-to-br from-[#001d3d] to-[#1e3a8a] rounded-xl p-6 shadow-lg">
-        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-[#FFC300]">gavel</span>
-          Resolution Panel
-        </h3>
-        <div class="bg-[#000814] rounded-lg p-4 mb-4">
-          <label class="block text-sm font-semibold mb-2 text-gray-300">
-            <span class="material-symbols-outlined text-sm align-middle mr-1">edit_note</span>
-            Resolution Notes
-          </label>
-          <textarea
-            [(ngModel)]="message"
-            placeholder="Provide a detailed explanation for your decision. This will be visible to all parties involved."
-            class="w-full rounded-lg p-4 bg-[#001d3d] border border-[#003566] focus:border-[#FFC300] focus:outline-none text-white placeholder-gray-500"
-            rows="5"
-          ></textarea>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button 
-            class="bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg py-4 transition-colors flex items-center justify-center gap-2 shadow-lg"
-            (click)="onResolve()">
-            <span class="material-symbols-outlined">check_circle</span>
-            Resolve Report
-          </button>
-          <button 
-            class="bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg py-4 transition-colors flex items-center justify-center gap-2 shadow-lg"
-            (click)="onDismiss()">
-            <span class="material-symbols-outlined">cancel</span>
-            Dismiss Report
-          </button>
+
+      @if(!isLocked()){
+        <div class="opacity-50 pointer-events-none">
+          <p class="text-red-400 font-semibold mb-3">
+            ⚠️ You must start reviewing to unlock actions.
+          </p>
+        </div>   
+        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mb-6
+                flex items-center justify-center gap-2 shadow-lg" (click)="startReview()" [disabled]="!canReview()">
+          <span class="material-symbols-outlined">lock_open</span>
+          Start Reviewing & Lock Report
+        </button>
+      }
+      @else{
+        <!-- If already locked -->
+        <div class="mb-6 text-green-400 font-semibold flex items-center gap-2">
+          <span class="material-symbols-outlined text-green-400">lock</span>
+          This report is currently locked by you.
         </div>
-      </div>
+      <!-- RELEASE LOCK BUTTON -->
+      <button
+        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg
+              flex items-center justify-center gap-2 shadow-lg"
+        (click)="releaseReviewLock()">
+        <span class="material-symbols-outlined">lock_reset</span>
+        Release Lock
+      </button>        
+      }
+
+      
+
+      
+      <!-- Resolution Panel -->
+      <div [ngClass]="{ 'opacity-50 pointer-events-none': !isLocked() }">
+        <div class="bg-gradient-to-br from-[#001d3d] to-[#1e3a8a] rounded-xl p-6 shadow-lg">
+          <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#FFC300]">gavel</span>
+            Resolution Panel
+          </h3>
+          <div class="bg-[#000814] rounded-lg p-4 mb-4">
+            <label class="block text-sm font-semibold mb-2 text-gray-300">
+              <span class="material-symbols-outlined text-sm align-middle mr-1">edit_note</span>
+              Resolution Notes
+            </label>
+            <textarea
+              [(ngModel)]="message"
+              placeholder="Provide a detailed explanation for your decision. This will be visible to all parties involved."
+              class="w-full rounded-lg p-4 bg-[#001d3d] border border-[#003566] focus:border-[#FFC300] focus:outline-none text-white placeholder-gray-500"
+              rows="5"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button 
+              class="bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg py-4 transition-colors flex items-center justify-center gap-2 shadow-lg"
+              (click)="onResolve()">
+              <span class="material-symbols-outlined">check_circle</span>
+              Resolve Report
+            </button>
+            <button 
+              class="bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg py-4 transition-colors flex items-center justify-center gap-2 shadow-lg"
+              (click)="onDismiss()">
+              <span class="material-symbols-outlined">cancel</span>
+              Dismiss Report
+            </button>
+          </div>
+        </div>
+      </div> 
 
       <!-- Admin Actions -->
-      <div class="bg-[#001d3d] rounded-xl p-6 shadow-lg border-2 border-[#FFC300]/30">
+      <div [ngClass]="{ 'opacity-50 pointer-events-none': !isLocked() }">      
+        <div class="bg-[#001d3d] rounded-xl p-6 shadow-lg border-2 border-[#FFC300]/30">
         <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
           <span class="material-symbols-outlined text-[#FFC300]">admin_panel_settings</span>
           Administrative Actions
@@ -341,6 +377,8 @@
           </div>
         </div>
       </div>
+    </div>
+
 
     </div>
   }

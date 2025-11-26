@@ -1,11 +1,11 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DeliveryService } from '../../services/delivery.service';
 import { DeliveryDetailsResponse } from '../../models/delivery.model';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
-import { of } from 'rxjs'; // لإدارة الـ Observable
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-delivery-details',

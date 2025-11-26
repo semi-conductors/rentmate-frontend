@@ -12,6 +12,7 @@ export interface ReportDetailsResponse {
   resolvedAt: string | null;
   claimedAt: string | null;
   lockExpiresAt: string | null;
+  resolutionNotes?: string;
   reporter: UserProfile;
   reported: UserProfile;
 }

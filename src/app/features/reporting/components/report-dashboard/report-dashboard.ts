@@ -102,7 +102,7 @@ export class ReportDashboardComponent {
     this.claiming.set(id);
     this.errorMessage.set(null);
     try {
-      await this.reportService.claimReport(id);
+      ///await this.reportService.claimReport(id);
       this.router.navigate(['/admin/reports', id]); // Proceed to management page
     } catch (error: any) {
       this.errorMessage.set(error.error.detail || 'Unable to claim this report.');     
