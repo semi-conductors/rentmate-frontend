@@ -8,7 +8,6 @@ import { RentalService } from '../../../rentals/services/rental-service';
   templateUrl: './payment-form.html',
   styleUrl: './payment-form.css'
 })
-
 export class PaymentComponent implements OnInit {
 
   private router = inject(Router);
@@ -79,29 +78,15 @@ export class PaymentComponent implements OnInit {
   // ---------------- PAYMENT PROCESS ----------------
 
   processPayment(): void {
-    const rental = this.rental();
-    if (!rental) return;
+    const id = this.rentalId();
+    if (!id) return;
 
     this.isProcessing.set(true);
 
-
-    this.rentalService.getRentalById(rental.rentalId).subscribe({
-      next: (updatedRental) => {
-        this.isProcessing.set(false);
-
-       
-        if (updatedRental.status === 'Paid') {
-          this.paymentStatus.set('success');
-        } else {
-          this.paymentStatus.set('failed');
-        }
-      },
-      error: () => {
-        this.isProcessing.set(false);
-        this.paymentStatus.set('failed');
-      }
-    });
-   }
+    // Redirect to external backend endpoint with rental ID
+    const url = `https://localhost-8181/payment/createpayment?id=${id}`;
+    window.location.href = url;
+  }
 
   closeSuccessMessage(): void {
     this.router.navigate(['/my-rentals']);
