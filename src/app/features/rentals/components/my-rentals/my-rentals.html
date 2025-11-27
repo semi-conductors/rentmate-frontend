@@ -47,24 +47,22 @@
   <!-- Rentals Grid -->
   <ng-container *ngIf="!isLoading() && rentals().length > 0">
     <div class="rentals-grid">
-      <div *ngFor="let rental of rentals()" class="rental-card" [class.has-payment]="rental.status === 'Approved'" (click)="viewDetails(rental.rentalId)">
+      <div *ngFor="let rental of rentals()" class="rental-card" [class.has-payment]="rental.status === 'Approved'"
+        (click)="viewDetails(rental.rentalId)">
         <div class="rental-icon">{{ rental.itemIcon || '📦' }}</div>
 
         <div class="rental-info">
           <div class="item-name">{{ rental.itemName || 'Loading...' }}</div>
-          <div class="dates">📅 {{ formatDate(rental.startDate) }} → {{ formatDate(rental.endDate) }} ({{ rental.rentalDays }} days)</div>
+          <div class="dates">📅 {{ formatDate(rental.startDate) }} → {{ formatDate(rental.endDate) }} ({{
+            rental.rentalDays }} days)</div>
         </div>
 
         <div class="rental-status" [style.background-color]="getStatusColor(rental.status) + '20'"
-             [style.border-color]="getStatusColor(rental.status)"
-             [style.color]="getStatusColor(rental.status)">
-          <ng-container [ngSwitch]="rental.status">
-            <span *ngSwitchCase="'Pending'">⏳ Pending</span>
-            <span *ngSwitchCase="'Approved'">✅ Approved</span>
-            <span *ngSwitchCase="'Rejected'">❌ Rejected</span>
-            <span *ngSwitchCase="'Completed'">🎉 Completed</span>
-          </ng-container>
+          [style.border-color]="getStatusColor(rental.status)" [style.color]="getStatusColor(rental.status)">
+
+          {{ rental.status }}
         </div>
+
 
         <ng-container *ngIf="rental.status === 'Approved'">
           <div class="rental-price">
@@ -79,7 +77,8 @@
     <!-- Pagination -->
     <div class="pagination">
       <button (click)="previousPage()" [disabled]="currentPage() === 0">← Previous</button>
-      <span class="page-info">Page <strong>{{ currentPage() + 1 }}</strong> of <strong>{{ totalPages() }}</strong></span>
+      <span class="page-info">Page <strong>{{ currentPage() + 1 }}</strong> of <strong>{{ totalPages()
+          }}</strong></span>
       <button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1">Next →</button>
     </div>
   </ng-container>

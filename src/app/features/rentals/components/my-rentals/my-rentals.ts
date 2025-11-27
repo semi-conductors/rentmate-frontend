@@ -94,9 +94,9 @@ export class MyRentals implements OnInit {
     this.router.navigate(['/rental-details', rentalId]);
   }
 
-  goToPayment(rental: any, event: Event): void {
+  goToPayment(rentalId: number, event: Event): void {
   event.stopPropagation();
-  this.router.navigate(['/payment-form', rental.rentalId]);
+  this.router.navigate(['/payment-form', rentalId]);
 }
 
 

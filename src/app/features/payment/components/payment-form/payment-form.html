@@ -1,0 +1,152 @@
+<div class="container">
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner">⏳</div>
+    <p>Loading payment details...</p>
+  </div>
+  }
+
+  <!-- Main Content -->
+  @if (!isLoading()) {
+  
+  <!-- Header -->
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">← Back to Details</button>
+    <div class="logo">Rent<span>Mate</span></div>
+  </div>
+
+  <!-- Success Modal/Overlay -->
+  @if (paymentStatus() === 'success') {
+  <div class="overlay">
+    <div class="success-modal">
+      <div class="success-icon">✅</div>
+      <h2 class="success-title">Payment Successful!</h2>
+      <p class="success-message">
+        Your payment has been processed successfully.<br />
+        Your rental is now confirmed and ready!
+      </p>
+      <div class="success-details">
+        <div class="detail-item">
+          <span class="detail-label">Amount Paid:</span>
+          <span class="detail-value">${{ rental()?.totalPrice?.toFixed(2) }}</span>
+        </div>
+      </div>
+      <button class="success-btn" (click)="closeSuccessMessage()">
+        🎉 Go to My Rentals
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Failed Modal/Overlay -->
+  @if (paymentStatus() === 'failed') {
+  <div class="overlay">
+    <div class="failed-modal">
+      <div class="failed-icon">❌</div>
+      <h2 class="failed-title">Payment Failed</h2>
+      <p class="failed-message">
+        Unfortunately, we couldn't process your payment.<br />
+        Please try again or contact support if the problem persists.
+      </p>
+      <div class="failed-actions">
+        <button class="retry-btn" (click)="retryPayment()">
+          🔄 Try Again
+        </button>
+        <button class="cancel-btn" (click)="goBack()">
+          ← Back to Details
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Payment Form (only show if status is idle) -->
+  @if (paymentStatus() === 'idle') {
+  <div class="payment-form-wrapper">
+    <div class="card payment-card">
+      <h2 class="card-title">💳 Complete Your Payment</h2>
+      <p class="payment-subtitle">
+        Total Amount: <span class="total-amount">${{ rental()?.totalPrice?.toFixed(2) || '0.00' }}</span>
+      </p>
+
+      <!-- Payment Form (For UI only) -->
+      <div class="form-container">
+        <!-- Card Number -->
+        <div class="form-group">
+          <label class="label">Card Number</label>
+          <input
+            type="text"
+            [value]="cardNumber()"
+            (input)="onCardNumberChange($any($event.target).value)"
+            placeholder="1234 5678 9012 3456"
+            maxlength="19"
+            class="input"
+          />
+        </div>
+
+        <!-- Card Name -->
+        <div class="form-group">
+          <label class="label">Cardholder Name</label>
+          <input
+            type="text"
+            [value]="cardName()"
+            (input)="cardName.set($any($event.target).value)"
+            placeholder="John Doe"
+            class="input"
+          />
+        </div>
+
+        <!-- Expiry & CVV -->
+        <div class="row-group">
+          <div class="form-group">
+            <label class="label">Expiry Date</label>
+            <input
+              type="text"
+              [value]="expiryDate()"
+              (input)="onExpiryChange($any($event.target).value)"
+              placeholder="MM/YY"
+              maxlength="5"
+              class="input"
+            />
+          </div>
+          <div class="form-group">
+            <label class="label">CVV</label>
+            <input
+              type="text"
+              [value]="cvv()"
+              (input)="cvv.set($any($event.target).value)"
+              placeholder="123"
+              maxlength="3"
+              class="input"
+            />
+          </div>
+        </div>
+
+        <!-- Security Note -->
+        <div class="security-note">
+          <span class="security-icon">🔒</span>
+          <p class="security-text">
+            Your payment information is encrypted and secure
+          </p>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          class="submit-btn"
+          (click)="processPayment()"
+          [disabled]="isProcessing()"
+        >
+          @if (isProcessing()) {
+            <span>⏳ Processing Payment...</span>
+          } @else {
+            <span>💳 Pay Now - ${{ rental()?.totalPrice?.toFixed(2) || '0.00' }}</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  }
+</div>
